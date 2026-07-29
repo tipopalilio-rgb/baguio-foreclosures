@@ -1,513 +1,711 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Baguio City Foreclosed Properties | Palico Realty</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; overflow-x: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baguio Foreclosures — Palico Realty</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --navy: #0f1a2e;
+  --navy-light: #1a2a4a;
+  --gold: #d4a843;
+  --gold-light: #e8c66a;
+  --gold-dark: #b8922e;
+  --cream: #faf8f5;
+  --gray-50: #f8f7f4;
+  --gray-100: #f0eee9;
+  --gray-200: #e0dcd5;
+  --gray-400: #a09888;
+  --gray-500: #8a7e6e;
+  --gray-600: #6b6055;
+  --gray-700: #4a4238;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+  --shadow-xl: 0 24px 60px rgba(0,0,0,0.15);
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--gray-700); background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
 
-    .hero {
-      position: relative; height: 70vh; min-height: 500px;
-      background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 100%);
-      display: flex; align-items: center; justify-content: center; overflow: hidden;
-    }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background: url('https://images.unsplash.com/photo-1725029688674-7b099272e139?w=1600&q=80') center/cover no-repeat;
-      opacity: 0.4;
-    }
-    .hero-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(10,22,40,0.3) 0%, rgba(10,22,40,0.85) 100%);
-    }
-    .hero-content {
-      position: relative; z-index: 2; text-align: center; padding: 2rem; max-width: 900px;
-    }
-    .hero-badge {
-      display: inline-block; background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15);
-      color: #f0c040; padding: 0.5rem 1.5rem; border-radius: 50px;
-      font-size: 0.85rem; font-weight: 500; letter-spacing: 1px;
-      text-transform: uppercase; margin-bottom: 1.5rem;
-    }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.5rem, 6vw, 4.5rem); color: #fff;
-      margin-bottom: 0.75rem; line-height: 1.1;
-    }
-    .hero h1 span { color: #f0c040; }
-    .hero p {
-      font-size: 1.15rem; color: rgba(255,255,255,0.8);
-      max-width: 650px; margin: 0 auto 2rem; line-height: 1.6;
-    }
-    .hero-stats { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; }
-    .hero-stat { text-align: center; }
-    .hero-stat-value { font-size: 2rem; font-weight: 700; color: #f0c040; }
-    .hero-stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
+.hero {
+  position: relative; min-height: 85vh;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&q=80') center/cover no-repeat;
+  opacity: 0.25; transform: scale(1.05);
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(15,26,46,0.92) 0%, rgba(26,42,74,0.85) 50%, rgba(15,26,46,0.95) 100%);
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(212,168,67,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(212,168,67,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-content {
+  position: relative; z-index: 2; text-align: center;
+  padding: 2rem; max-width: 850px; opacity: 0; transform: translateY(30px);
+  animation: heroFadeIn 0.8s ease forwards 0.3s;
+}
+@keyframes heroFadeIn { to { opacity: 1; transform: translateY(0); } }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(212,168,67,0.12);
+  border: 1px solid rgba(212,168,67,0.25);
+  color: var(--gold-light); padding: 0.45rem 1.25rem;
+  border-radius: 50px; font-size: 0.8rem; font-weight: 500;
+  letter-spacing: 0.04em; margin-bottom: 1.5rem;
+  backdrop-filter: blur(8px);
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  color: #fff; margin-bottom: 0.75rem; line-height: 1.08;
+  font-weight: 600;
+}
+.hero h1 span { color: var(--gold); }
+.hero p {
+  font-size: 1.1rem; color: rgba(255,255,255,0.65);
+  max-width: 580px; margin: 0 auto 2.5rem; line-height: 1.7;
+  font-weight: 300;
+}
+.hero-stats {
+  display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap;
+  padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.hero-stat-value {
+  font-size: 2rem; font-weight: 700; color: var(--gold);
+  letter-spacing: -0.02em;
+}
+.hero-stat-label {
+  font-size: 0.8rem; color: rgba(255,255,255,0.45);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px;
+}
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
-    .section { padding: 3rem 0; }
-    .section-title {
-      font-family: 'Playfair Display', serif; font-size: 2rem;
-      color: #1a1a2e; margin-bottom: 0.5rem;
-    }
-    .section-subtitle { color: #666; font-size: 1rem; margin-bottom: 2rem; }
-    .section-divider {
-      width: 60px; height: 3px; background: #f0c040; margin: 0.5rem 0 1.5rem;
-    }
+.container { max-width: 1240px; margin: 0 auto; padding: 0 2rem; }
 
-    .controls-bar {
-      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
-      margin-bottom: 1.5rem; padding: 1.25rem; background: #fff;
-      border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .controls-bar .result-count {
-      font-size: 0.85rem; color: #888; margin-left: auto; white-space: nowrap;
-    }
-    .controls-bar .result-count strong { color: #1a1a2e; }
-    .search-input {
-      flex: 1; min-width: 200px; padding: 0.7rem 1rem; border: 1px solid #e0e0e0;
-      border-radius: 10px; font-size: 0.9rem; font-family: inherit;
-      transition: border-color 0.2s;
-    }
-    .search-input:focus { outline: none; border-color: #f0c040; }
-    .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .filter-btn {
-      padding: 0.45rem 1rem; border-radius: 50px; border: 1px solid #ddd;
-      background: #fff; cursor: pointer; font-size: 0.82rem; font-weight: 500;
-      transition: all 0.2s; font-family: inherit;
-    }
-    .filter-btn:hover { border-color: #f0c040; }
-    .filter-btn.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
-    .sort-select {
-      padding: 0.45rem 1rem; border-radius: 10px; border: 1px solid #ddd;
-      font-size: 0.82rem; font-family: inherit; background: #fff; cursor: pointer;
-    }
+.section-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 2rem; gap: 1rem;
+}
+.section-header-left { }
+.section-label {
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--gold-dark); font-weight: 600; margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; color: var(--navy); font-weight: 600;
+}
 
-    .property-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1.25rem;
-    }
-    .property-card {
-      background: #fff; border-radius: 16px; overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-      transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
-    }
-    .property-card:hover {
-      transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1);
-    }
-    .property-image {
-      height: 200px; background: #e8edf2;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden; position: relative;
-    }
-    .property-image .emoji-icon { font-size: 3rem; }
-    .property-badge {
-      position: absolute; top: 12px; left: 12px;
-      background: #f0c040; color: #1a1a2e; padding: 0.3rem 0.8rem;
-      border-radius: 6px; font-size: 0.75rem; font-weight: 600;
-    }
-    .property-badge-source {
-      position: absolute; top: 12px; right: 12px;
-      background: rgba(26,26,46,0.85); color: #fff; padding: 0.3rem 0.8rem;
-      border-radius: 6px; font-size: 0.7rem; font-weight: 500;
-    }
-    .property-body { padding: 1.2rem; }
-    .property-type {
-      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px;
-      color: #f0c040; font-weight: 600;
-    }
-    .property-title { font-size: 1rem; font-weight: 600; margin: 0.3rem 0; color: #1a1a2e; }
-    .property-location { font-size: 0.82rem; color: #888; margin-bottom: 0.3rem; }
-    .property-price { font-size: 1.25rem; font-weight: 700; color: #1a1a2e; margin: 0.4rem 0; }
-    .property-details { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0; }
-    .property-detail {
-      font-size: 0.78rem; color: #666; background: #f0f2f5;
-      padding: 0.2rem 0.65rem; border-radius: 6px;
-    }
-    .property-source {
-      font-size: 0.78rem; color: #999; margin-top: 0.5rem;
-      padding-top: 0.6rem; border-top: 1px solid #eee;
-    }
+.filters-bar {
+  position: relative; z-index: 10;
+  background: #fff; border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem; margin-bottom: 2rem;
+  box-shadow: var(--shadow-md); display: flex; gap: 1rem;
+  flex-wrap: wrap; align-items: center;
+}
+.filters-bar.sticky {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  border-radius: 0; box-shadow: var(--shadow-lg);
+  padding: 0.9rem 2rem; animation: slideDown 0.3s ease;
+  margin-bottom: 0;
+}
+@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+.filters-bar.sticky + .filters-spacer { display: block; }
+.filters-spacer { display: none; }
 
-    .no-results {
-      grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;
-      color: #888;
-    }
-    .no-results h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: #555; }
+.search-wrap {
+  position: relative; flex: 1; min-width: 200px;
+}
+.search-wrap i {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--gray-400); font-size: 0.9rem;
+}
+.search-input {
+  width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1.5px solid var(--gray-200); border-radius: 10px;
+  font-size: 0.88rem; font-family: inherit; color: var(--gray-700);
+  background: var(--gray-50); transition: all 0.2s;
+}
+.search-input:focus { outline: none; border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(212,168,67,0.1); }
+.search-input::placeholder { color: var(--gray-400); }
 
-    .map-section { padding: 3rem 0; }
-    #property-map { height: 450px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.filter-group { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; }
+.filter-group-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--gray-500); font-weight: 600; margin-right: 0.25rem;
+}
+.filter-btn {
+  padding: 0.45rem 1rem; border-radius: 8px; border: 1.5px solid var(--gray-200);
+  background: #fff; cursor: pointer; font-size: 0.8rem; font-weight: 500;
+  color: var(--gray-600); transition: all 0.2s; font-family: inherit;
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--gold); color: var(--gold-dark); }
+.filter-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
 
-    @media (max-width: 768px) {
-      .property-grid { grid-template-columns: 1fr; }
-      .hero { height: 60vh; min-height: 400px; }
-      .hero-stats { gap: 1.5rem; }
-      .controls-bar .result-count { width: 100%; text-align: left; }
-    }
+.sort-select {
+  padding: 0.45rem 1rem; border-radius: 8px; border: 1.5px solid var(--gray-200);
+  font-size: 0.8rem; font-family: inherit; background: #fff;
+  color: var(--gray-600); cursor: pointer; font-weight: 500;
+}
+.sort-select:focus { outline: none; border-color: var(--gold); }
+.result-count {
+  font-size: 0.82rem; color: var(--gray-500); white-space: nowrap;
+  margin-left: auto;
+}
+.result-count strong { color: var(--gray-700); }
 
-    .cta-section {
-      background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
-      color: #fff; text-align: center; padding: 4rem 2rem;
-      border-radius: 20px; margin: 2rem 0;
-    }
-    .cta-section h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 1rem; }
-    .cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 2rem; }
-    .cta-button {
-      display: inline-block; padding: 1rem 2.5rem; background: #f0c040;
-      color: #1a1a2e; border-radius: 50px; font-weight: 600;
-      text-decoration: none; transition: transform 0.2s;
-    }
-    .cta-button:hover { transform: translateY(-2px); }
-    footer { text-align: center; padding: 2rem; color: #888; font-size: 0.85rem; border-top: 1px solid #eee; }
-  </style>
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+.property-card {
+  background: #fff; border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm); transition: all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  cursor: pointer; opacity: 0; transform: translateY(20px);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.property-card.visible { opacity: 1; transform: translateY(0); }
+.property-card:hover {
+  transform: translateY(-6px); box-shadow: var(--shadow-xl);
+}
+.property-image {
+  height: 210px; display: flex; align-items: center;
+  justify-content: center; position: relative; overflow: hidden;
+}
+.property-image .emoji-icon { font-size: 3.2rem; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1)); }
+.property-badge-featured {
+  position: absolute; top: 14px; left: 14px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: #fff; padding: 0.25rem 0.85rem; border-radius: 6px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(212,168,67,0.3);
+}
+.property-badge-source {
+  position: absolute; top: 14px; right: 14px;
+  background: rgba(15,26,46,0.85); backdrop-filter: blur(8px);
+  color: #fff; padding: 0.25rem 0.85rem; border-radius: 6px;
+  font-size: 0.7rem; font-weight: 500;
+}
+.property-body { padding: 1.35rem 1.5rem 1.5rem; }
+.property-type {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--gold-dark); font-weight: 600;
+}
+.property-title {
+  font-size: 1.05rem; font-weight: 600; margin: 0.3rem 0 0.2rem;
+  color: var(--navy); line-height: 1.3;
+}
+.property-location {
+  font-size: 0.82rem; color: var(--gray-500);
+  display: flex; align-items: center; gap: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+.property-location i { font-size: 0.7rem; color: var(--gray-400); }
+.property-price {
+  font-size: 1.3rem; font-weight: 700; color: var(--navy);
+  margin: 0.5rem 0;
+}
+.property-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0.5rem 0; }
+.property-tag {
+  font-size: 0.75rem; color: var(--gray-600);
+  background: var(--gray-50); padding: 0.2rem 0.7rem;
+  border-radius: 6px; font-weight: 500;
+}
+.property-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--gray-100);
+}
+.property-footer .contact-link {
+  font-size: 0.78rem; color: var(--navy); font-weight: 500;
+  text-decoration: none;
+}
+.property-footer .contact-link i { margin-right: 0.3rem; }
+.property-footer .view-link {
+  font-size: 0.78rem; color: var(--gray-500); font-weight: 500;
+  text-decoration: none; transition: color 0.2s;
+}
+.property-footer .view-link:hover { color: var(--gold-dark); }
+.property-footer .view-link i { font-size: 0.7rem; margin-left: 0.3rem; }
+
+.no-results {
+  grid-column: 1 / -1; text-align: center; padding: 5rem 2rem;
+}
+.no-results i { font-size: 3rem; color: var(--gray-200); margin-bottom: 1rem; }
+.no-results h3 { font-size: 1.2rem; color: var(--gray-600); margin-bottom: 0.5rem; }
+.no-results p { color: var(--gray-400); font-size: 0.9rem; }
+
+.map-section { padding: 4rem 0; }
+.map-container {
+  position: relative; border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.map-container .map-attribution-fix { display: none; }
+#property-map { height: 460px; width: 100%; }
+.leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important; }
+.leaflet-popup-content { margin: 14px 18px !important; font-family: 'Inter', sans-serif !important; }
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(15,26,46,0.7); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem; animation: modalFade 0.25s ease;
+}
+@keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: #fff; border-radius: var(--radius-lg); max-width: 640px;
+  width: 100%; max-height: 88vh; overflow-y: auto;
+  box-shadow: var(--shadow-xl); animation: modalSlide 0.3s ease;
+  position: relative;
+}
+@keyframes modalSlide { from { transform: translateY(30px) scale(0.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+.modal-close {
+  position: sticky; top: 0; float: right; z-index: 1;
+  width: 36px; height: 36px; display: flex; align-items: center;
+  justify-content: center; border: none; background: var(--gray-100);
+  border-radius: 50%; cursor: pointer; color: var(--gray-600);
+  font-size: 1.2rem; margin: 12px 12px 0 0; transition: all 0.2s;
+}
+.modal-close:hover { background: var(--gray-200); }
+.modal-header {
+  padding: 0 2rem 1.5rem; margin-top: -8px;
+}
+.modal-icon { font-size: 2.8rem; margin-bottom: 0.75rem; display: block; }
+.modal-source-badge {
+  display: inline-block; padding: 0.25rem 1rem; border-radius: 6px;
+  color: #fff; font-size: 0.75rem; font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.modal h2 { font-size: 1.35rem; color: var(--navy); line-height: 1.3; margin-bottom: 0.3rem; }
+.modal .modal-location {
+  color: var(--gray-500); font-size: 0.88rem; margin-bottom: 1rem;
+}
+.modal .modal-price {
+  font-size: 1.8rem; font-weight: 700; color: var(--navy);
+  margin-bottom: 1rem;
+}
+.modal .modal-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.modal-body { padding: 0 2rem 1.5rem; }
+.modal-body p { color: var(--gray-600); font-size: 0.92rem; line-height: 1.7; }
+.modal-contact {
+  background: var(--gray-50); border-radius: var(--radius);
+  padding: 1.25rem; margin-top: 1.25rem;
+}
+.modal-contact-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.88rem; color: var(--gray-600); padding: 0.35rem 0;
+}
+.modal-contact-item i { width: 16px; color: var(--gold-dark); }
+.modal-contact-item a { color: var(--navy); font-weight: 500; text-decoration: none; }
+.modal-contact-item a:hover { text-decoration: underline; }
+.modal-actions {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem;
+}
+.modal-actions .btn-primary {
+  padding: 0.7rem 1.5rem; background: var(--navy); color: #fff;
+  border-radius: 10px; text-decoration: none; font-size: 0.85rem;
+  font-weight: 500; transition: background 0.2s; display: inline-flex;
+  align-items: center; gap: 0.5rem;
+}
+.modal-actions .btn-primary:hover { background: var(--navy-light); }
+.modal-actions .btn-secondary {
+  padding: 0.7rem 1.5rem; background: transparent; color: var(--gray-500);
+  border: 1.5px solid var(--gray-200); border-radius: 10px;
+  cursor: pointer; font-size: 0.85rem; font-weight: 500;
+  font-family: inherit; transition: all 0.2s;
+}
+.modal-actions .btn-secondary:hover { border-color: var(--gray-400); }
+
+.cta-section {
+  background: linear-gradient(135deg, var(--navy) 0%, #1f2d4a 100%);
+  color: #fff; text-align: center; padding: 5rem 3rem;
+  border-radius: var(--radius-lg); margin: 3rem 0;
+  position: relative; overflow: hidden;
+}
+.cta-section::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(212,168,67,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(212,168,67,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.cta-section h2 {
+  font-family: 'Playfair Display', serif; font-size: 2.2rem;
+  margin-bottom: 0.75rem; position: relative;
+}
+.cta-section p { color: rgba(255,255,255,0.6); position: relative; }
+.cta-contacts {
+  display: flex; gap: 0.75rem; justify-content: center;
+  flex-wrap: wrap; margin-top: 1.5rem; position: relative;
+}
+.cta-contact-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.5rem 1rem; border-radius: 8px;
+  font-size: 0.78rem; color: rgba(255,255,255,0.6);
+}
+.cta-contact-pill a { color: var(--gold-light); text-decoration: none; font-weight: 500; }
+
+footer {
+  text-align: center; padding: 3rem 2rem; color: var(--gray-500);
+  font-size: 0.82rem; border-top: 1px solid var(--gray-200);
+}
+footer strong { color: var(--gray-700); }
+
+.back-to-top {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 50;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--navy); color: var(--gold); border: none;
+  cursor: pointer; box-shadow: var(--shadow-lg);
+  font-size: 1.1rem; display: flex; align-items: center;
+  justify-content: center; opacity: 0; transform: translateY(20px);
+  transition: all 0.3s; pointer-events: none;
+}
+.back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.back-to-top:hover { background: var(--navy-light); transform: translateY(-2px); }
+
+@media (max-width: 768px) {
+  .property-grid { grid-template-columns: 1fr; }
+  .hero { min-height: 70vh; }
+  .hero-stats { gap: 1.5rem; }
+  .filters-bar { padding: 1rem; border-radius: var(--radius); }
+  .filters-bar.sticky { padding: 0.75rem 1rem; }
+  .result-count { width: 100%; text-align: left; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .map-section { padding: 2rem 0; }
+  #property-map { height: 320px; }
+  .modal { margin: 0.5rem; max-height: 92vh; }
+  .modal-header, .modal-body { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .cta-section { padding: 3rem 1.5rem; border-radius: var(--radius); }
+}
+</style>
 </head>
 <body>
 
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
 <section class="hero">
-  <div class="hero-bg"></div>
   <div class="hero-overlay"></div>
+  <div class="hero-grid"></div>
   <div class="hero-content">
-    <div class="hero-badge">Baguio City, Philippines</div>
+    <div class="hero-badge"><i class="fas fa-map-pin"></i> Baguio City, Philippines</div>
     <h1>Foreclosed <span>Properties</span> in Baguio</h1>
-    <p>Curated listings of bank-foreclosed and government-acquired properties in the Summer Capital of the Philippines. Prime investment opportunities starting from &#8369;413,000.</p>
+    <p>Curated listings of bank-foreclosed and government-acquired properties. Prime investment opportunities starting from &#8369;413,000.</p>
     <div class="hero-stats">
-      <div class="hero-stat">
-        <div class="hero-stat-value" id="stat-count">20+</div>
-        <div class="hero-stat-label">Properties</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-value">&#8369;413K</div>
-        <div class="hero-stat-label">Starting Price</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-value" id="stat-sources">10+</div>
-        <div class="hero-stat-label">Sources</div>
-      </div>
+      <div class="hero-stat"><div class="hero-stat-value" id="heroCount">20+</div><div class="hero-stat-label">Properties</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">&#8369;413K</div><div class="hero-stat-label">Starting Price</div></div>
+      <div class="hero-stat"><div class="hero-stat-value" id="heroSources">14</div><div class="hero-stat-label">Sources</div></div>
     </div>
   </div>
 </section>
 
 <div class="container">
 
-  <section class="section" id="listings-section">
-    <div class="section-title">Available Foreclosed Properties</div>
-    <div class="section-divider"></div>
-    <p class="section-subtitle">Click any property card for details. Filter, search, and sort below.</p>
-
-    <div class="controls-bar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Search by location, title, or keyword...">
-      <div class="filter-group" id="sourceFilters"></div>
-      <div class="filter-group" id="typeFilters"></div>
-      <select class="sort-select" id="sortSelect">
-        <option value="default">Default order</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="name">Name: A-Z</option>
-      </select>
-      <div class="result-count" id="resultCount">Showing <strong>0</strong> properties</div>
+  <section class="section-header" style="margin-top:2.5rem;">
+    <div class="section-header-left">
+      <div class="section-label">Properties</div>
+      <h2 class="section-title">Available Foreclosures</h2>
     </div>
-
-    <div class="property-grid" id="propertyGrid"></div>
   </section>
 
+  <div class="filters-bar" id="filtersBar">
+    <div class="search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search by title, location, or source...">
+    </div>
+    <div class="filter-group">
+      <span class="filter-group-label">Source</span>
+      <div id="sourceFilters"></div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-group-label">Type</span>
+      <div id="typeFilters"></div>
+    </div>
+    <select class="sort-select" id="sortSelect">
+      <option value="default">Default</option>
+      <option value="price-asc">Price &#8593;</option>
+      <option value="price-desc">Price &#8595;</option>
+      <option value="name">A-Z</option>
+    </select>
+    <div class="result-count" id="resultCount">Showing <strong>0</strong> properties</div>
+  </div>
+  <div class="filters-spacer" id="filtersSpacer"></div>
+
+  <div class="property-grid" id="propertyGrid"></div>
+
   <section class="map-section">
-    <div class="section-title">Property Map</div>
-    <div class="section-divider"></div>
-    <p class="section-subtitle">Approximate locations of featured properties in Baguio City.</p>
-    <div id="property-map"></div>
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-label">Map View</div>
+        <h2 class="section-title">Explore Locations</h2>
+      </div>
+    </div>
+    <div class="map-container">
+      <div id="property-map"></div>
+    </div>
   </section>
 
   <section class="cta-section">
-    <h2>Interested in a Property?</h2>
-    <p>Contact the respective bank or agent directly using the information provided above. For BSP, Pag-IBIG, and GSIS properties, follow their official procedures.</p>
-    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">Have a specific inquiry? Call or email us: <a href="mailto:tipopalilio@gmail.com" style="color: #f0c040; text-decoration: none;">tipopalilio@gmail.com</a></p>
+    <h2>Ready to Invest in Baguio?</h2>
+    <p>Contact the respective bank or agent directly using the details above. For BSP, Pag-IBIG, and GSIS properties, follow their official procedures.</p>
+    <p style="margin-top:1.5rem;font-size:0.9rem;">Have a specific inquiry? <a href="mailto:tipopalilio@gmail.com" style="color:var(--gold-light);font-weight:600;text-decoration:none;">tipopalilio@gmail.com</a></p>
+    <div class="cta-contacts">
+      <span class="cta-contact-pill">BSP: <a href="mailto:CoronadoVM@bsp.gov.ph">CoronadoVM@bsp.gov.ph</a></span>
+      <span class="cta-contact-pill">BPI: <a href="mailto:buenamano@bpi.com.ph">buenamano@bpi.com.ph</a></span>
+      <span class="cta-contact-pill">EastWest: <a href="mailto:reproperties@eastwestbanker.com">reproperties@eastwestbanker.com</a></span>
+      <span class="cta-contact-pill">Metrobank: <a href="mailto:goldamier.galorio@metrobank.com.ph">goldamier.galorio@metrobank.com.ph</a></span>
+    </div>
   </section>
 
 </div>
 
 <footer>
-  <p>Palico Realty &mdash; Baguio City Foreclosure Listings &bull; Updated July 2026</p>
-  <p style="margin-top: 0.5rem; font-size: 0.8rem;">Information is sourced from bank and government websites. Prices and availability subject to change. Verify all details with the respective institution.</p>
+  <p><strong>Palico Realty</strong> &mdash; Baguio City Foreclosure Listings &bull; Updated July 2026</p>
+  <p style="margin-top:0.5rem;">Information sourced from bank and government websites. Prices and availability subject to change. Verify all details with the respective institution.</p>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const properties = [
-  { id: 'bsp-cliff', title: 'Cliff Drive Residential Lot', location: 'Purok Ongasan, Brgy. Loakan, Baguio City', price: 4095000, type: 'Lot', source: 'BSP', area: '', description: 'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit.', contact: 'CoronadoVM@bsp.gov.ph', contactName: 'Manolito V. Coronado Jr.', phone: '(02) 5306-3422', featured: true, lat: 16.411, lng: 120.622 },
-  { id: 'bpi-sunnyside', title: 'Sunnyside Residential Lots (L3-L10 B8)', location: 'Fairview / Sunnyside Subdivision, Baguio City', price: 416000, type: 'Lot', source: 'BPI', area: '~800 sqm each', description: 'Multiple residential lots available through Buena Mano program.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.395, lng: 120.575 },
-  { id: 'bpi-sunnyside-2', title: 'Sunnyside Lot (L3 B8)', location: 'Sunnyside Subdivision, Brgy. Fairview, Baguio City', price: 416000, type: 'Lot', source: 'BPI', area: '~800 sqm', description: 'Foreclosed lot in Sunnyside Subdivision. Sold as-is, where-is.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.394, lng: 120.574 },
-  { id: 'bpi-bermuda', title: 'Bermuda Hills House & Lot', location: 'Bermuda Hills Subdivision, Baguio City', price: 12700000, type: 'House', source: 'BPI', area: '', description: 'Foreclosed house and lot property. High equity required.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.388, lng: 120.565 },
-  { id: 'bpi-megatower', title: 'Megatower Residences Condo', location: 'Near SM City Baguio, Baguio City', price: 0, type: 'Condo', source: 'BPI', area: '', description: 'Prime location condominium unit. Price upon inquiry.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.401, lng: 120.598 },
-  { id: 'security-bank', title: 'Bakakeng Central Lot', location: 'Crystal Cave, Bakakeng Central, District 14, Baguio City', price: 28171000, type: 'Lot', source: 'Security Bank', area: '2,667 sqm', description: 'Large residential lot in Bakakeng Central area.', contact: 'NPinson@securitybank.com', contactName: 'N. Pinson', phone: '', lat: 16.418, lng: 120.602 },
-  { id: 'miyabi', title: 'Ferguson Road House & Lot', location: 'Ferguson Road / Andres Bonifacio, Baguio City', price: 16000000, type: 'House', source: 'Claire Miyabi', area: '240 sqm lot', description: 'House and lot in prime Baguio location.', contact: 'admin@miyabirealty.com', contactName: 'Claire Miyabi', phone: '+63 9505870775', lat: 16.409, lng: 120.608 },
-  { id: 'msg', title: 'San Luis Village Lot', location: 'Asin Road, Baguio City', price: 10125000, type: 'Lot', source: 'MSG Realty', area: '15,000 sqm', description: 'Expansive lot in San Luis Village. Ref: MSG-44-0620.', contact: 'info@msg-homes.com', contactName: 'MSG Realty', phone: '', lat: 16.382, lng: 120.55 },
-  { id: 'bdo', title: 'Ciudad Grande Condo', location: 'Donya Aurora Drive, Bakakeng North, Baguio City', price: 1650000, type: 'Condo', source: 'BDO', area: '15 sqm', description: 'Condominium unit in Ciudad Grande Subdivision.', contact: 'retailsales@bdo.com.ph', contactName: 'BDO Assets', phone: '', lat: 16.42, lng: 120.605 },
-  { id: 'pnb', title: 'Balacbac Road Lot', location: 'Brgy. Balacbac, Baguio City', price: 0, type: 'Lot', source: 'PNB', area: '996 sqm', description: 'Residential lot along Balacbac Road. Price upon inquiry.', contact: 'tubiganeb@pnb.com.ph', contactName: 'PNB CAR Region', phone: '', lat: 16.43, lng: 120.59 },
-  { id: 'pagibig-sto-tomas', title: 'Santo Tomas Lot', location: 'C.C.O.D.A. Subdivision, Baguio City', price: 1215000, type: 'Lot', source: 'Pag-IBIG', area: '', description: 'Negotiated sale residential lot in Santo Tomas Proper.', contact: 'pagibigfundservices.com', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.365, lng: 120.56 },
-  { id: 'pagibig-wharton', title: 'North Cambridge Wharton Condo', location: 'Unit 3F-20, Bakakeng Norte, Baguio City', price: 2365200, type: 'Condo', source: 'Pag-IBIG', area: '', description: 'Condominium unit in North Cambridge Wharton.', contact: 'pagibigfundservices.com', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.416, lng: 120.6 },
-  { id: 'pagibig-court', title: '3rd The Court Condo', location: 'CY-M2-B3-3BF-002, Ambiong, Baguio City', price: 5250000, type: 'Condo', source: 'Pag-IBIG', area: '', description: 'Condominium unit at 3rd The Court, Ambiong.', contact: 'pagibigfundservices.com', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.404, lng: 120.582 },
-  { id: 'pagibig-princeton', title: 'North Cambridge Princeton Condo', location: 'Unit GF-J & Unit 2-LGF, Bakakeng Norte, Baguio City', price: 1756875, type: 'Condo', source: 'Pag-IBIG', area: '', description: 'Available condominium units in North Cambridge Princeton.', contact: 'acquiredassets.ph', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.417, lng: 120.601 },
-  { id: 'ew-eastwest', title: 'EastWest EasySale Properties', location: 'Various locations, Baguio City', price: 0, type: 'Various', source: 'EastWest', area: '', description: 'Various foreclosed properties under EastWest EasySale Program. Browse online portal for current listings.', contact: 'reproperties@eastwestbanker.com', contactName: 'EastWest Bank', phone: '0999 8857830', lat: 16.412, lng: 120.595 },
-  { id: 'metro-aurora', title: 'Aurora Hill Lot (Metrobank)', location: 'Aurora Hill & Other Areas, Baguio City', price: 0, type: 'Lot', source: 'Metrobank', area: '', description: 'Foreclosed properties including residential lots in Aurora Hill. Contact marketing officer for inventory.', contact: 'goldamier.galorio@metrobank.com.ph', contactName: 'Metrobank AAMDD', phone: '(02) 8830-6204', lat: 16.407, lng: 120.59 },
-  { id: 'china-bank', title: 'China Bank Acquired Assets', location: 'Baguio City & Benguet Province', price: 0, type: 'Various', source: 'China Bank', area: '', description: 'China Bank acquired assets for sale. Visit their online portal.', contact: 'chinabank.ph/acquired-assets-for-sale', contactName: 'China Bank', phone: '', lat: 16.403, lng: 120.587 },
-  { id: 'gsis-lwob', title: 'GSIS LWOB Properties (17 units)', location: 'Various locations, Baguio City', price: 0, type: 'Various', source: 'GSIS', area: '', description: '17 properties in Baguio under Lease with Option to Buy (LWOB) program.', contact: 'gsisrpamdcst@gsis.gov.ph', contactName: 'GSIS RPAMD', phone: '', lat: 16.41, lng: 120.592 },
-  { id: 'rcbc-auction', title: 'RCBC Disposed Properties', location: 'Various locations, Baguio City', price: 0, type: 'Various', source: 'RCBC', area: '', description: 'RCBC sells foreclosed properties through public auctions. Download latest listing from their website.', contact: 'epsilvestre@rcbc.com', contactName: 'RCBC', phone: '', lat: 16.406, lng: 120.596 },
-  { id: 'cari-sluh', title: 'SLU-SVP Housing Village House', location: 'SLU-SVP Housing Village, Baguio City', price: 19215000, type: 'House', source: 'Cari / Dotproperty', area: '25BR', description: 'Large house in SLU-SVP Housing Village.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.38, lng: 120.57 },
-  { id: 'cari-dominican', title: 'Dominican Hill House', location: 'Dominican Hill–Mirador, Baguio City', price: 7170000, type: 'House', source: 'Cari / Dotproperty', area: '', description: 'House in Dominican Hill-Mirador area.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.396, lng: 120.589 },
-  { id: 'cari-pacdal', title: 'Pacdal Townhouse', location: 'Pacdal / Brentwood Village, Baguio City', price: 5959700, type: 'Townhouse', source: 'Cari / Dotproperty', area: '4BR', description: 'Townhouse in Pacdal / Brentwood Village.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.399, lng: 120.578 },
-  { id: 'cari-irisan', title: 'Irisan House', location: 'Irisan, Baguio City', price: 8340000, type: 'House', source: 'Cari / Dotproperty', area: '', description: 'House in Irisan area.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.36, lng: 120.53 },
-  { id: 'cari-camp7', title: 'Camp 7 House', location: 'Camp 7, Baguio City', price: 5590000, type: 'House', source: 'Cari / Dotproperty', area: '4BR', description: 'House in Camp 7 area.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.375, lng: 120.58 },
-  { id: 'cari-sto-tomas', title: 'Lexberville House', location: 'Lexberville, Sto. Tomas, Baguio City', price: 8800000, type: 'House', source: 'Cari / Dotproperty', area: '', description: 'House in Lexberville, Sto. Tomas.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.358, lng: 120.555 },
-  { id: 'cari-quezon-hill', title: 'Middle Quezon Hill House', location: 'Middle Quezon Hill, Baguio City', price: 6070000, type: 'House', source: 'Cari / Dotproperty', area: '5BR', description: 'House in Middle Quezon Hill.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.385, lng: 120.562 },
-  { id: 'cari-san-luis', title: 'San Luis Village Lot', location: 'San Luis Village, Baguio City', price: 4410000, type: 'Lot', source: 'Cari / Dotproperty', area: 'w/ Improvement', description: 'Lot with improvement in San Luis Village.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.383, lng: 120.548 },
+  { id:'bsp-cliff', title:'Cliff Drive Residential Lot', location:'Purok Ongasan, Brgy. Loakan, Baguio City', price:4095000, type:'Lot', source:'BSP', area:'', desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price.', contact:'CoronadoVM@bsp.gov.ph', contactName:'Manolito V. Coronado Jr.', phone:'(02) 5306-3422', featured:true, lat:16.411, lng:120.622 },
+  { id:'bpi-sunnyside', title:'Sunnyside Residential Lots (L3-L10 B8)', location:'Fairview / Sunnyside Subdivision, Baguio City', price:416000, type:'Lot', source:'BPI', area:'~800 sqm each', desc:'Multiple residential lots available through the Buena Mano program. Sold as-is, where-is.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.395, lng:120.575 },
+  { id:'bpi-bermuda', title:'Bermuda Hills House & Lot', location:'Bermuda Hills Subdivision, Baguio City', price:12700000, type:'House', source:'BPI', area:'', desc:'Foreclosed house and lot property in Bermuda Hills. High equity required.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.388, lng:120.565 },
+  { id:'bpi-megatower', title:'Megatower Residences Condominium', location:'Near SM City Baguio, Baguio City', price:0, type:'Condo', source:'BPI', area:'', desc:'Prime location condominium unit near SM City Baguio. Price upon inquiry.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.401, lng:120.598 },
+  { id:'security-bank', title:'Bakakeng Central Lot — Crystal Cave', location:'Crystal Cave, Bakakeng Central, District 14, Baguio City', price:28171000, type:'Lot', source:'Security Bank', area:'2,667 sqm', desc:'Large residential lot in Bakakeng Central area.', contact:'NPinson@securitybank.com', contactName:'N. Pinson', phone:'', lat:16.418, lng:120.602 },
+  { id:'miyabi', title:'Ferguson Road House & Lot', location:'Ferguson Road / Andres Bonifacio, Baguio City', price:16000000, type:'House', source:'Claire Miyabi', area:'240 sqm lot', desc:'House and lot in prime Baguio location.', contact:'admin@miyabirealty.com', contactName:'Claire Miyabi', phone:'+63 9505870775', lat:16.409, lng:120.608 },
+  { id:'msg', title:'San Luis Village Lot — Asin Road', location:'Asin Road, Baguio City', price:10125000, type:'Lot', source:'MSG Realty', area:'15,000 sqm', desc:'Expansive lot in San Luis Village. Ref: MSG-44-0620.', contact:'info@msg-homes.com', contactName:'MSG Realty', phone:'', lat:16.382, lng:120.55 },
+  { id:'bdo', title:'Ciudad Grande Condominium Unit', location:'Donya Aurora Drive, Bakakeng North, Baguio City', price:1650000, type:'Condo', source:'BDO', area:'15 sqm', desc:'Condominium unit in Ciudad Grande Subdivision.', contact:'retailsales@bdo.com.ph', contactName:'BDO Assets', phone:'', lat:16.42, lng:120.605 },
+  { id:'pnb', title:'Balacbac Road Residential Lot', location:'Brgy. Balacbac, Baguio City', price:0, type:'Lot', source:'PNB', area:'996 sqm', desc:'Residential lot along Balacbac Road. Price upon inquiry.', contact:'tubiganeb@pnb.com.ph', contactName:'PNB CAR Region', phone:'', lat:16.43, lng:120.59 },
+  { id:'pagibig-sto-tomas', title:'Santo Tomas Lot — C.C.O.D.A.', location:'C.C.O.D.A. Subdivision, Baguio City', price:1215000, type:'Lot', source:'Pag-IBIG', area:'', desc:'Negotiated sale residential lot in Santo Tomas Proper.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.365, lng:120.56 },
+  { id:'pagibig-wharton', title:'North Cambridge Wharton Condo', location:'Unit 3F-20, Bakakeng Norte, Baguio City', price:2365200, type:'Condo', source:'Pag-IBIG', area:'', desc:'Condominium unit in North Cambridge Wharton.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.416, lng:120.6 },
+  { id:'pagibig-court', title:"3rd The Court Condominium — Ambiong", location:'CY-M2-B3-3BF-002, Ambiong, Baguio City', price:5250000, type:'Condo', source:'Pag-IBIG', area:'', desc:'Condominium unit at 3rd The Court, Ambiong.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.404, lng:120.582 },
+  { id:'pagibig-princeton', title:'North Cambridge Princeton Condo Units', location:'Unit GF-J & Unit 2-LGF, Bakakeng Norte, Baguio City', price:1756875, type:'Condo', source:'Pag-IBIG', area:'', desc:'Available condominium units in North Cambridge Princeton.', contact:'acquiredassets.ph', contactName:'Pag-IBIG Fund', phone:'', lat:16.417, lng:120.601 },
+  { id:'ew-eastwest', title:'EastWest EasySale Properties', location:'Various locations, Baguio City', price:0, type:'Various', source:'EastWest', area:'', desc:'Various foreclosed properties under the EastWest EasySale Program. Browse their online portal.', contact:'reproperties@eastwestbanker.com', contactName:'EastWest Bank', phone:'0999 8857830', lat:16.412, lng:120.595 },
+  { id:'metro-aurora', title:'Aurora Hill Residential Lot', location:'Aurora Hill, Baguio City', price:0, type:'Lot', source:'Metrobank', area:'', desc:'Foreclosed residential lot in Aurora Hill. Contact marketing officer for inventory.', contact:'goldamier.galorio@metrobank.com.ph', contactName:'Metrobank AAMDD', phone:'(02) 8830-6204', lat:16.407, lng:120.59 },
+  { id:'china-bank', title:'China Bank Acquired Assets', location:'Baguio City & Benguet Province', price:0, type:'Various', source:'China Bank', area:'', desc:'China Bank acquired assets for sale. Visit their online portal for current listings.', contact:'chinabank.ph/acquired-assets-for-sale', contactName:'China Bank', phone:'', lat:16.403, lng:120.587 },
+  { id:'gsis-lwob', title:'GSIS LWOB Properties (17 units)', location:'Various locations, Baguio City', price:0, type:'Various', source:'GSIS', area:'', desc:'17 properties in Baguio under the Lease with Option to Buy (LWOB) program.', contact:'gsisrpamdcst@gsis.gov.ph', contactName:'GSIS RPAMD', phone:'', lat:16.41, lng:120.592 },
+  { id:'rcbc-auction', title:'RCBC Disposed Properties', location:'Various locations, Baguio City', price:0, type:'Various', source:'RCBC', area:'', desc:'RCBC sells foreclosed properties through public auctions. Download latest listing from their website.', contact:'epsilvestre@rcbc.com', contactName:'RCBC', phone:'', lat:16.406, lng:120.596 },
+  { id:'cari-sluh', title:'SLU-SVP Housing Village (25BR)', location:'SLU-SVP Housing Village, Baguio City', price:19215000, type:'House', source:'Cari / Dotproperty', area:'25BR', desc:'Large house in SLU-SVP Housing Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.38, lng:120.57 },
+  { id:'cari-dominican', title:'Dominican Hill–Mirador House', location:'Dominican Hill–Mirador, Baguio City', price:7170000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Dominican Hill-Mirador area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.396, lng:120.589 },
+  { id:'cari-pacdal', title:'Pacdal / Brentwood Townhouse', location:'Pacdal / Brentwood Village, Baguio City', price:5959700, type:'Townhouse', source:'Cari / Dotproperty', area:'4BR', desc:'Townhouse in Pacdal / Brentwood Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.399, lng:120.578 },
+  { id:'cari-irisan', title:'Irisan House', location:'Irisan, Baguio City', price:8340000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Irisan area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.36, lng:120.53 },
+  { id:'cari-camp7', title:'Camp 7 House (4BR)', location:'Camp 7, Baguio City', price:5590000, type:'House', source:'Cari / Dotproperty', area:'4BR', desc:'House in Camp 7 area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.375, lng:120.58 },
+  { id:'cari-sto-tomas', title:'Lexberville House — Sto. Tomas', location:'Lexberville, Sto. Tomas, Baguio City', price:8800000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Lexberville, Sto. Tomas.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.358, lng:120.555 },
+  { id:'cari-quezon-hill', title:'Middle Quezon Hill House (5BR)', location:'Middle Quezon Hill, Baguio City', price:6070000, type:'House', source:'Cari / Dotproperty', area:'5BR', desc:'House in Middle Quezon Hill.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.385, lng:120.562 },
+  { id:'cari-san-luis', title:'San Luis Village Lot w/ Improvement', location:'San Luis Village, Baguio City', price:4410000, type:'Lot', source:'Cari / Dotproperty', area:'Improvement', desc:'Lot with improvement in San Luis Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.383, lng:120.548 },
 ];
 
-function formatPrice(p) {
-  if (!p || p === 0) return 'Price upon inquiry';
-  return '₱' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
-const typeIcons = { 'Lot': '🏞️', 'House': '🏠', 'Condo': '🏢', 'Townhouse': '🏘️', 'Various': '📋' };
-const sourceColors = {
-  'BSP': '#8B0000', 'BPI': '#003D7A', 'Pag-IBIG': '#006847', 'Security Bank': '#002D62',
-  'Claire Miyabi': '#6A0DAD', 'MSG Realty': '#2E7D32', 'BDO': '#003D7A', 'PNB': '#1A237E',
-  'EastWest': '#B8860B', 'Metrobank': '#C41E3A', 'China Bank': '#8B0000', 'GSIS': '#4A148C',
-  'RCBC': '#D32F2F', 'Cari / Dotproperty': '#555555'
+function fmt(p) { return p ? '₱' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 'Price upon inquiry'; }
+const icons = { 'Lot':'fa-tree','House':'fa-house-chimney','Condo':'fa-building','Townhouse':'fa-house-chimney-window','Various':'fa-layer-group' };
+const srcColor = {
+  'BSP':'#8B0000','BPI':'#004785','Pag-IBIG':'#007a4d','Security Bank':'#002d62',
+  'Claire Miyabi':'#5B2D8E','MSG Realty':'#2E7D32','BDO':'#003d7a','PNB':'#1a237e',
+  'EastWest':'#b8860b','Metrobank':'#b71c1c','China Bank':'#8b0000','GSIS':'#4a148c',
+  'RCBC':'#d32f2f','Cari / Dotproperty':'#5d4037'
 };
 
-let filteredProperties = [...properties];
-let map = null;
-let markers = [];
+let filtered = [...properties];
+let map = null, mapMarkers = [];
 
-function getUniqueSources() { return [...new Set(properties.map(p => p.source))]; }
-function getUniqueTypes() { return [...new Set(properties.map(p => p.type))]; }
+function srcs() { return [...new Set(properties.map(p=>p.source))]; }
+function types() { return [...new Set(properties.map(p=>p.type))]; }
 
 function renderFilters() {
-  const sourceContainer = document.getElementById('sourceFilters');
-  const typeContainer = document.getElementById('typeFilters');
-
-  let sourceHTML = '<button class="filter-btn active" data-filter="source" data-value="all">All Sources</button>';
-  getUniqueSources().forEach(s => {
-    sourceHTML += `<button class="filter-btn" data-filter="source" data-value="${s}">${s}</button>`;
-  });
-  sourceContainer.innerHTML = sourceHTML;
-
-  let typeHTML = '<button class="filter-btn active" data-filter="type" data-value="all">All Types</button>';
-  getUniqueTypes().forEach(t => {
-    typeHTML += `<button class="filter-btn" data-filter="type" data-value="${t}">${t}</button>`;
-  });
-  typeContainer.innerHTML = typeHTML;
-
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const filter = this.dataset.filter;
-      const value = this.dataset.value;
-      document.querySelectorAll(`.filter-btn[data-filter="${filter}"]`).forEach(b => b.classList.remove('active'));
+  const sf = document.getElementById('sourceFilters');
+  const tf = document.getElementById('typeFilters');
+  let sh = '<button class="filter-btn active" data-f="source" data-v="all">All</button>';
+  srcs().forEach(s=>{ sh+=`<button class="filter-btn" data-f="source" data-v="${s}">${s}</button>` });
+  sf.innerHTML = sh;
+  let th = '<button class="filter-btn active" data-f="type" data-v="all">All</button>';
+  types().forEach(t=>{ th+=`<button class="filter-btn" data-f="type" data-v="${t}">${icons[t]?`<i class="fas ${icons[t]}"></i> `:''}${t}</button>` });
+  tf.innerHTML = th;
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.addEventListener('click', function(){
+      const f=this.dataset.f, v=this.dataset.v;
+      document.querySelectorAll(`.filter-btn[data-f="${f}"]`).forEach(x=>x.classList.remove('active'));
       this.classList.add('active');
-      applyFilters();
+      apply();
     });
   });
 }
 
-function applyFilters() {
-  const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  const activeSource = document.querySelector('.filter-btn.active[data-filter="source"]')?.dataset.value || 'all';
-  const activeType = document.querySelector('.filter-btn.active[data-filter="type"]')?.dataset.value || 'all';
-  const sort = document.getElementById('sortSelect').value;
-
-  filteredProperties = properties.filter(p => {
-    const matchSearch = !query || p.title.toLowerCase().includes(query) || p.location.toLowerCase().includes(query) || p.source.toLowerCase().includes(query) || p.type.toLowerCase().includes(query);
-    const matchSource = activeSource === 'all' || p.source === activeSource;
-    const matchType = activeType === 'all' || p.type === activeType;
-    return matchSearch && matchSource && matchType;
+function apply() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const s = document.querySelector('.filter-btn.active[data-f="source"]')?.dataset.v||'all';
+  const t = document.querySelector('.filter-btn.active[data-f="type"]')?.dataset.v||'all';
+  const o = document.getElementById('sortSelect').value;
+  filtered = properties.filter(p=>{
+    const mq = !q || p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q) || p.source.toLowerCase().includes(q) || p.type.toLowerCase().includes(q);
+    const ms = s==='all'||p.source===s;
+    const mt = t==='all'||p.type===t;
+    return mq&&ms&&mt;
   });
-
-  if (sort === 'price-asc') filteredProperties.sort((a, b) => (a.price || Infinity) - (b.price || Infinity));
-  else if (sort === 'price-desc') filteredProperties.sort((a, b) => (b.price || 0) - (a.price || 0));
-  else if (sort === 'name') filteredProperties.sort((a, b) => a.title.localeCompare(b.title));
-
-  renderProperties();
+  if (o==='price-asc') filtered.sort((a,b)=>(a.price||Infinity)-(b.price||Infinity));
+  else if (o==='price-desc') filtered.sort((a,b)=>(b.price||0)-(a.price||0));
+  else if (o==='name') filtered.sort((a,b)=>a.title.localeCompare(b.title));
+  render();
   updateMap();
 }
 
-function renderProperties() {
-  const grid = document.getElementById('propertyGrid');
-  const count = document.getElementById('resultCount');
-
-  if (filteredProperties.length === 0) {
-    grid.innerHTML = '<div class="no-results"><h3>No properties found</h3><p>Try adjusting your search or filters.</p></div>';
-    count.innerHTML = 'Showing <strong>0</strong> properties';
-    return;
+function render() {
+  const g = document.getElementById('propertyGrid');
+  const c = document.getElementById('resultCount');
+  if (!filtered.length) {
+    g.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><h3>No properties found</h3><p>Try adjusting your search or filters.</p></div>';
+    c.innerHTML = 'Showing <strong>0</strong> properties'; return;
   }
-
-  let html = '';
-  filteredProperties.forEach(p => {
-    const icon = typeIcons[p.type] || '📋';
-    const color = sourceColors[p.source] || '#555';
-    const priceDisplay = formatPrice(p.price);
-    const featuredTag = p.featured ? '<span class="property-badge">FEATURED</span>' : '';
-
-    html += `
-      <div class="property-card" data-id="${p.id}">
-        <div class="property-image" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
-          <span class="emoji-icon">${icon}</span>
-          ${featuredTag}
-          <span class="property-badge-source">${p.source}</span>
+  let h = '';
+  filtered.forEach(p=>{
+    const fe = p.featured ? `<span class="property-badge-featured"><i class="fas fa-star"></i> FEATURED</span>` : '';
+    const clr = srcColor[p.source]||'#555';
+    h+=`<div class="property-card" data-id="${p.id}">
+      <div class="property-image" style="background:linear-gradient(135deg,${clr}18,${clr}06);">
+        <span class="emoji-icon">${p.type==='Lot'?'🏞️':p.type==='House'?'🏠':p.type==='Condo'?'🏢':p.type==='Townhouse'?'🏘️':'📋'}</span>
+        ${fe}
+        <span class="property-badge-source">${p.source}</span>
+      </div>
+      <div class="property-body">
+        <div class="property-type">${p.type}</div>
+        <div class="property-title">${p.title}</div>
+        <div class="property-location"><i class="fas fa-location-dot"></i> ${p.location}</div>
+        <div class="property-price">${fmt(p.price)}</div>
+        <div class="property-tags">
+          ${p.area?`<span class="property-tag"><i class="fas fa-vector-square"></i> ${p.area}</span>`:''}
+          <span class="property-tag"><i class="fas fa-tag"></i> ${p.source}</span>
         </div>
-        <div class="property-body">
-          <div class="property-type">${p.type}</div>
-          <div class="property-title">${p.title}</div>
-          <div class="property-location">${p.location}</div>
-          <div class="property-price">${priceDisplay}</div>
-          <div class="property-details">
-            ${p.area ? `<span class="property-detail">${p.area}</span>` : ''}
-            <span class="property-detail">${p.source}</span>
-          </div>
-          ${p.contact ? `<div class="property-source">Contact: ${p.contact}</div>` : ''}
+        <div class="property-footer">
+          <span class="contact-link">${p.contact&&p.contact.includes('@')?`<i class="fas fa-envelope"></i>${p.contact}`:''}</span>
+          <a class="view-link">View Details <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>
-    `;
+    </div>`;
   });
+  g.innerHTML = h;
+  c.innerHTML = `Showing <strong>${filtered.length}</strong> of <strong>${properties.length}</strong> properties`;
+  document.getElementById('heroCount').textContent = filtered.length+'+';
 
-  grid.innerHTML = html;
-  count.innerHTML = `Showing <strong>${filteredProperties.length}</strong> of <strong>${properties.length}</strong> properties`;
-
-  document.getElementById('stat-count').textContent = filteredProperties.length + '+';
-
-  grid.querySelectorAll('.property-card').forEach(card => {
-    card.addEventListener('click', function() {
-      const id = this.dataset.id;
-      const prop = properties.find(p => p.id === id);
-      if (prop) showPropertyModal(prop);
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, { threshold:0.08 });
+  g.querySelectorAll('.property-card').forEach(card=>{
+    observer.observe(card);
+    card.addEventListener('click', ()=>{
+      const p = properties.find(x=>x.id===card.dataset.id);
+      if(p) showModal(p);
     });
   });
 }
 
-function showPropertyModal(prop) {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px); display: flex; align-items: center;
-    justify-content: center; padding: 1.5rem; animation: fadeIn 0.2s ease;
-  `;
-  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    background: #fff; border-radius: 20px; max-width: 600px; width: 100%;
-    max-height: 85vh; overflow-y: auto; padding: 2rem; position: relative;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: slideUp 0.25s ease;
-  `;
-
-  const closeBtn = document.createElement('button');
-  closeBtn.innerHTML = '&times;';
-  closeBtn.style.cssText = `
-    position: absolute; top: 12px; right: 16px; background: none; border: none;
-    font-size: 1.8rem; cursor: pointer; color: #999; line-height: 1;
-  `;
-  closeBtn.onclick = () => overlay.remove();
-
-  const icon = typeIcons[prop.type] || '📋';
-  const priceDisplay = formatPrice(prop.price);
-  const color = sourceColors[prop.source] || '#555';
-
-  modal.innerHTML = `
-    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
-      <span style="font-size:2.5rem">${icon}</span>
-      <div>
-        <span class="property-type">${prop.type}</span>
-        <div class="property-title" style="font-size:1.15rem">${prop.title}</div>
+function showModal(p) {
+  const o = document.createElement('div'); o.className = 'modal-overlay';
+  o.onclick = e => { if(e.target===o) o.remove(); };
+  const clr = srcColor[p.source]||'#555';
+  o.innerHTML = `<div class="modal">
+    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+    <div class="modal-header">
+      <span class="modal-icon">${p.type==='Lot'?'🏞️':p.type==='House'?'🏠':p.type==='Condo'?'🏢':p.type==='Townhouse'?'🏘️':'📋'}</span>
+      <div class="modal-source-badge" style="background:${clr}">${p.source}</div>
+      <h2>${p.title}</h2>
+      <div class="modal-location"><i class="fas fa-location-dot"></i> ${p.location}</div>
+      <div class="modal-price">${fmt(p.price)}</div>
+      <div class="modal-tags">
+        ${p.area?`<span class="property-tag"><i class="fas fa-vector-square"></i> ${p.area}</span>`:''}
+        <span class="property-tag"><i class="fas fa-tag"></i> ${p.source}</span>
+        <span class="property-tag"><i class="fas ${icons[p.type]||'fa-home'}"></i> ${p.type}</span>
       </div>
     </div>
-    <div class="property-location" style="margin-bottom:0.75rem;">📍 ${prop.location}</div>
-    <div style="font-size:1.6rem;font-weight:700;color:#1a1a2e;margin-bottom:1rem;">${priceDisplay}</div>
-    <div class="property-details" style="margin-bottom:1rem;">
-      ${prop.area ? `<span class="property-detail">${prop.area}</span>` : ''}
-      <span class="property-detail" style="background:${color};color:#fff;">${prop.source}</span>
+    <div class="modal-body">
+      <p>${p.desc}</p>
+      <div class="modal-contact">
+        ${p.contactName?`<div class="modal-contact-item"><i class="fas fa-user"></i> ${p.contactName}</div>`:''}
+        ${p.contact&&p.contact.includes('@')?`<div class="modal-contact-item"><i class="fas fa-envelope"></i> <a href="mailto:${p.contact}">${p.contact}</a></div>`:''}
+        ${p.contact&&!p.contact.includes('@')&&p.contact.includes('.')?`<div class="modal-contact-item"><i class="fas fa-globe"></i> <a href="https://${p.contact}" target="_blank">${p.contact}</a></div>`:''}
+        ${p.phone?`<div class="modal-contact-item"><i class="fas fa-phone"></i> ${p.phone}</div>`:''}
+      </div>
+      <div class="modal-actions">
+        ${p.contact&&p.contact.includes('@')?`<a class="btn-primary" href="mailto:${p.contact}"><i class="fas fa-paper-plane"></i> Send Inquiry</a>`:''}
+        <button class="btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+      </div>
     </div>
-    <p style="color:#555;font-size:0.9rem;line-height:1.7;margin-bottom:1.25rem;">${prop.description}</p>
-    ${prop.contactName ? `<p style="color:#888;font-size:0.85rem;margin-bottom:0.25rem;">Contact: <strong>${prop.contactName}</strong></p>` : ''}
-    ${prop.contact ? `<p style="color:#888;font-size:0.85rem;margin-bottom:0.25rem;">Email: <a href="mailto:${prop.contact}" style="color:#1a1a2e;font-weight:500;">${prop.contact}</a></p>` : ''}
-    ${prop.phone ? `<p style="color:#888;font-size:0.85rem;">Phone: ${prop.phone}</p>` : ''}
-    <div style="margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
-      ${prop.contact && prop.contact.includes('@') ? `<a href="mailto:${prop.contact}" style="padding:0.6rem 1.5rem;background:#1a1a2e;color:#fff;border-radius:10px;text-decoration:none;font-size:0.85rem;font-weight:500;">Send Inquiry</a>` : ''}
-      <button onclick="this.closest('div[style]').parentElement.remove()" style="padding:0.6rem 1.5rem;background:transparent;color:#666;border:1px solid #ddd;border-radius:10px;cursor:pointer;font-size:0.85rem;font-family:inherit;">Close</button>
-    </div>
-  `;
-
-  modal.prepend(closeBtn);
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  </div>`;
+  document.body.appendChild(o);
 }
 
 function initMap() {
-  map = L.map('property-map', { zoomControl: true }).setView([16.402, 120.585], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  map = L.map('property-map', { zoomControl:true }).setView([16.402,120.585], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
   }).addTo(map);
   updateMap();
 }
 
 function updateMap() {
-  if (!map) return;
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
-
-  const shownIds = new Set(filteredProperties.map(p => p.id));
-  const toShow = properties.filter(p => shownIds.has(p.id) && p.lat && p.lng);
-
-  if (toShow.length === 0) return;
-
-  toShow.forEach(p => {
-    const color = sourceColors[p.source] || '#555';
-    const icon = L.divIcon({
-      html: `<div style="background:${color};color:#fff;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.2);">${typeIcons[p.type]||'📋'} ${formatPrice(p.price) === 'Price upon inquiry' ? 'Inquire' : formatPrice(p.price)}</div>`,
-      className: '', iconSize: [0, 0], iconAnchor: [40, 12]
-    });
-    const marker = L.marker([p.lat, p.lng], { icon }).addTo(map);
-    const priceDisplay = formatPrice(p.price);
-    marker.bindPopup(`
-      <div style="font-family:Inter,sans-serif;min-width:200px;">
-        <strong style="font-size:0.95rem;">${p.title}</strong>
-        <div style="color:#666;font-size:0.8rem;margin:4px 0;">${p.location}</div>
-        <div style="font-size:1.1rem;font-weight:700;color:#1a1a2e;margin:6px 0;">${priceDisplay}</div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0;">
-          <span style="background:#f0f2f5;padding:2px 8px;border-radius:4px;font-size:0.75rem;">${p.type}</span>
-          <span style="background:${color};color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;">${p.source}</span>
-        </div>
-        <button onclick="document.querySelector('[data-id=\\'${p.id}\\']')?.click()" style="margin-top:6px;padding:4px 12px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;">View Details</button>
+  if(!map) return;
+  mapMarkers.forEach(m=>map.removeLayer(m));
+  mapMarkers = [];
+  const ids = new Set(filtered.map(p=>p.id));
+  const shown = properties.filter(p=>ids.has(p.id)&&p.lat&&p.lng);
+  if(!shown.length) return;
+  shown.forEach(p=>{
+    const clr = srcColor[p.source]||'#555';
+    const m = L.marker([p.lat,p.lng], {
+      icon: L.divIcon({
+        html:`<div style="background:${clr};color:#fff;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.2);">${fmt(p.price).substring(0,14)}</div>`,
+        className:'', iconSize:[0,0], iconAnchor:[40,14]
+      })
+    }).addTo(map);
+    m.bindPopup(`<div style="font-family:Inter,sans-serif;min-width:200px;">
+      <strong style="font-size:0.95rem;color:#1a1a2e;">${p.title}</strong>
+      <div style="color:#8a7e6e;font-size:0.82rem;margin:4px 0;"><i class="fas fa-location-dot"></i> ${p.location}</div>
+      <div style="font-size:1.15rem;font-weight:700;color:#0f1a2e;margin:8px 0;">${fmt(p.price)}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0;">
+        <span style="background:#f0eee9;padding:2px 10px;border-radius:5px;font-size:0.75rem;">${p.type}</span>
+        <span style="background:${clr};color:#fff;padding:2px 10px;border-radius:5px;font-size:0.75rem;">${p.source}</span>
       </div>
-    `);
-    markers.push(marker);
+      <button onclick="document.querySelector('.modal-overlay')?.remove();(function(){const card=document.querySelector('[data-id=\\'${p.id}\\']');if(card)card.click()})()" style="margin-top:8px;padding:6px 16px;background:#0f1a2e;color:#fff;border:none;border-radius:8px;font-size:0.82rem;cursor:pointer;width:100%;">View Details</button>
+    </div>`);
+    mapMarkers.push(m);
   });
-
-  if (toShow.length === 1) {
-    map.setView([toShow[0].lat, toShow[0].lng], 14);
-  } else {
-    const group = L.featureGroup(markers);
-    map.fitBounds(group.getBounds().pad(0.15));
-  }
+  if(shown.length===1) map.setView([shown[0].lat,shown[0].lng],14);
+  else { const g = L.featureGroup(mapMarkers); map.fitBounds(g.getBounds().pad(0.15)); }
 }
 
-document.getElementById('searchInput').addEventListener('input', applyFilters);
-document.getElementById('sortSelect').addEventListener('change', applyFilters);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove()); });
+document.getElementById('searchInput').addEventListener('input', apply);
+document.getElementById('sortSelect').addEventListener('change', apply);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-overlay').forEach(el=>el.remove()); });
+
+// Sticky filter bar
+const fb = document.getElementById('filtersBar');
+const fs = document.getElementById('filtersSpacer');
+const fbTop = fb.offsetTop;
+window.addEventListener('scroll', ()=>{
+  if(window.scrollY >= fbTop) { fb.classList.add('sticky'); fs.style.height = fb.offsetHeight + 'px'; }
+  else { fb.classList.remove('sticky'); fs.style.height = '0'; }
+  document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 400);
+});
+document.getElementById('backToTop').addEventListener('click', ()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
 
 renderFilters();
-applyFilters();
+apply();
 initMap();
-
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-`;
-document.head.appendChild(style);
+document.getElementById('heroSources').textContent = srcs().length;
 </script>
 </body>
 </html>
