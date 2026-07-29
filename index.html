@@ -4,282 +4,166 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Baguio City Foreclosed Properties | Palico Realty</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; }
+    body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; overflow-x: hidden; }
 
     .hero {
-      position: relative;
-      height: 70vh;
-      min-height: 500px;
+      position: relative; height: 70vh; min-height: 500px;
       background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
     }
     .hero-bg {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: url('https://images.unsplash.com/photo-1725029688674-7b099272e139?w=1600&q=80') center/cover no-repeat;
       opacity: 0.4;
     }
     .hero-overlay {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: linear-gradient(180deg, rgba(10,22,40,0.3) 0%, rgba(10,22,40,0.85) 100%);
     }
     .hero-content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      padding: 2rem;
-      max-width: 900px;
+      position: relative; z-index: 2; text-align: center; padding: 2rem; max-width: 900px;
     }
     .hero-badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #f0c040;
-      padding: 0.5rem 1.5rem;
-      border-radius: 50px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      display: inline-block; background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15);
+      color: #f0c040; padding: 0.5rem 1.5rem; border-radius: 50px;
+      font-size: 0.85rem; font-weight: 500; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 1.5rem;
     }
     .hero h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      color: #fff;
-      margin-bottom: 0.75rem;
-      line-height: 1.1;
+      font-size: clamp(2.5rem, 6vw, 4.5rem); color: #fff;
+      margin-bottom: 0.75rem; line-height: 1.1;
     }
     .hero h1 span { color: #f0c040; }
     .hero p {
-      font-size: 1.15rem;
-      color: rgba(255,255,255,0.8);
-      max-width: 650px;
-      margin: 0 auto 2rem;
-      line-height: 1.6;
+      font-size: 1.15rem; color: rgba(255,255,255,0.8);
+      max-width: 650px; margin: 0 auto 2rem; line-height: 1.6;
     }
-    .hero-stats {
-      display: flex;
-      gap: 2.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .hero-stat {
-      text-align: center;
-    }
-    .hero-stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #f0c040;
-    }
-    .hero-stat-label {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.6);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .hero-stats { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; }
+    .hero-stat { text-align: center; }
+    .hero-stat-value { font-size: 2rem; font-weight: 700; color: #f0c040; }
+    .hero-stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
 
     .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
-
-    .section { padding: 4rem 0; }
+    .section { padding: 3rem 0; }
     .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      color: #1a1a2e;
-      margin-bottom: 0.5rem;
+      font-family: 'Playfair Display', serif; font-size: 2rem;
+      color: #1a1a2e; margin-bottom: 0.5rem;
     }
-    .section-subtitle {
-      color: #666;
-      font-size: 1rem;
-      margin-bottom: 2.5rem;
-    }
+    .section-subtitle { color: #666; font-size: 1rem; margin-bottom: 2rem; }
     .section-divider {
-      width: 60px;
-      height: 3px;
-      background: #f0c040;
-      margin: 0.75rem 0 1.5rem;
+      width: 60px; height: 3px; background: #f0c040; margin: 0.5rem 0 1.5rem;
     }
 
-    .source-tabs {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
+    .controls-bar {
+      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+      margin-bottom: 1.5rem; padding: 1.25rem; background: #fff;
+      border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     }
-    .source-tab {
-      padding: 0.6rem 1.5rem;
-      border-radius: 50px;
-      border: 1px solid #ddd;
-      background: #fff;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: all 0.2s;
+    .controls-bar .result-count {
+      font-size: 0.85rem; color: #888; margin-left: auto; white-space: nowrap;
     }
-    .source-tab:hover { border-color: #f0c040; }
-    .source-tab.active {
-      background: #1a1a2e;
-      color: #fff;
-      border-color: #1a1a2e;
+    .controls-bar .result-count strong { color: #1a1a2e; }
+    .search-input {
+      flex: 1; min-width: 200px; padding: 0.7rem 1rem; border: 1px solid #e0e0e0;
+      border-radius: 10px; font-size: 0.9rem; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { outline: none; border-color: #f0c040; }
+    .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 0.45rem 1rem; border-radius: 50px; border: 1px solid #ddd;
+      background: #fff; cursor: pointer; font-size: 0.82rem; font-weight: 500;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .filter-btn:hover { border-color: #f0c040; }
+    .filter-btn.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+    .sort-select {
+      padding: 0.45rem 1rem; border-radius: 10px; border: 1px solid #ddd;
+      font-size: 0.82rem; font-family: inherit; background: #fff; cursor: pointer;
     }
 
     .property-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 1.5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.25rem;
     }
     .property-card {
-      background: #fff;
-      border-radius: 16px;
-      overflow: hidden;
+      background: #fff; border-radius: 16px; overflow: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
     }
     .property-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+      transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1);
     }
     .property-image {
-      height: 220px;
-      background: #e8edf2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
+      height: 200px; background: #e8edf2;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
     }
-    .property-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .property-image .no-image {
-      color: #999;
-      font-size: 0.9rem;
-      text-align: center;
-      padding: 1rem;
-    }
+    .property-image .emoji-icon { font-size: 3rem; }
     .property-badge {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: #f0c040;
-      color: #1a1a2e;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      position: absolute; top: 12px; left: 12px;
+      background: #f0c040; color: #1a1a2e; padding: 0.3rem 0.8rem;
+      border-radius: 6px; font-size: 0.75rem; font-weight: 600;
     }
-    .property-body { padding: 1.25rem; }
+    .property-badge-source {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(26,26,46,0.85); color: #fff; padding: 0.3rem 0.8rem;
+      border-radius: 6px; font-size: 0.7rem; font-weight: 500;
+    }
+    .property-body { padding: 1.2rem; }
     .property-type {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #f0c040;
-      font-weight: 600;
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #f0c040; font-weight: 600;
     }
-    .property-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin: 0.3rem 0;
-      color: #1a1a2e;
-    }
-    .property-location {
-      font-size: 0.85rem;
-      color: #888;
-      margin-bottom: 0.5rem;
-    }
-    .property-location::before { content: "ðŸ“ "; }
-    .property-price {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin: 0.5rem 0;
-    }
-    .property-details {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin: 0.5rem 0;
-    }
+    .property-title { font-size: 1rem; font-weight: 600; margin: 0.3rem 0; color: #1a1a2e; }
+    .property-location { font-size: 0.82rem; color: #888; margin-bottom: 0.3rem; }
+    .property-price { font-size: 1.25rem; font-weight: 700; color: #1a1a2e; margin: 0.4rem 0; }
+    .property-details { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0; }
     .property-detail {
-      font-size: 0.82rem;
-      color: #666;
-      background: #f0f2f5;
-      padding: 0.25rem 0.75rem;
-      border-radius: 6px;
+      font-size: 0.78rem; color: #666; background: #f0f2f5;
+      padding: 0.2rem 0.65rem; border-radius: 6px;
     }
     .property-source {
-      font-size: 0.8rem;
-      color: #999;
-      margin-top: 0.5rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid #eee;
+      font-size: 0.78rem; color: #999; margin-top: 0.5rem;
+      padding-top: 0.6rem; border-top: 1px solid #eee;
     }
-    .property-contact {
-      display: inline-block;
-      margin-top: 0.5rem;
-      padding: 0.4rem 1rem;
-      background: #1a1a2e;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .property-contact:hover { background: #f0c040; color: #1a1a2e; }
 
-    
-
-    /* Lightbox */
-
-    .cta-section {
-      background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
-      color: #fff;
-      text-align: center;
-      padding: 4rem 2rem;
-      border-radius: 20px;
-      margin: 3rem 0;
-    }
-    .cta-section h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    .cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 2rem; }
-    .cta-button {
-      display: inline-block;
-      padding: 1rem 2.5rem;
-      background: #f0c040;
-      color: #1a1a2e;
-      border-radius: 50px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: transform 0.2s;
-    }
-    .cta-button:hover { transform: translateY(-2px); }
-
-    footer {
-      text-align: center;
-      padding: 2rem;
+    .no-results {
+      grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;
       color: #888;
-      font-size: 0.85rem;
-      border-top: 1px solid #eee;
     }
+    .no-results h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: #555; }
+
+    .map-section { padding: 3rem 0; }
+    #property-map { height: 450px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
 
     @media (max-width: 768px) {
       .property-grid { grid-template-columns: 1fr; }
       .hero { height: 60vh; min-height: 400px; }
       .hero-stats { gap: 1.5rem; }
+      .controls-bar .result-count { width: 100%; text-align: left; }
     }
+
+    .cta-section {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+      color: #fff; text-align: center; padding: 4rem 2rem;
+      border-radius: 20px; margin: 2rem 0;
+    }
+    .cta-section h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 1rem; }
+    .cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 2rem; }
+    .cta-button {
+      display: inline-block; padding: 1rem 2.5rem; background: #f0c040;
+      color: #1a1a2e; border-radius: 50px; font-weight: 600;
+      text-decoration: none; transition: transform 0.2s;
+    }
+    .cta-button:hover { transform: translateY(-2px); }
+    footer { text-align: center; padding: 2rem; color: #888; font-size: 0.85rem; border-top: 1px solid #eee; }
   </style>
 </head>
 <body>
@@ -288,20 +172,20 @@
   <div class="hero-bg"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <div class="hero-badge">ðŸ“ Baguio City, Philippines</div>
+    <div class="hero-badge">Baguio City, Philippines</div>
     <h1>Foreclosed <span>Properties</span> in Baguio</h1>
-    <p>Curated listings of bank-foreclosed and government-acquired properties in the Summer Capital of the Philippines. Prime investment opportunities starting from â‚±413,000.</p>
+    <p>Curated listings of bank-foreclosed and government-acquired properties in the Summer Capital of the Philippines. Prime investment opportunities starting from &#8369;413,000.</p>
     <div class="hero-stats">
       <div class="hero-stat">
-        <div class="hero-stat-value">20+</div>
+        <div class="hero-stat-value" id="stat-count">20+</div>
         <div class="hero-stat-label">Properties</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-value">â‚±413K</div>
+        <div class="hero-stat-value">&#8369;413K</div>
         <div class="hero-stat-label">Starting Price</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-value">10+</div>
+        <div class="hero-stat-value" id="stat-sources">10+</div>
         <div class="hero-stat-label">Sources</div>
       </div>
     </div>
@@ -310,411 +194,38 @@
 
 <div class="container">
 
-  <!-- Introduction -->
-  <section class="section">
+  <section class="section" id="listings-section">
     <div class="section-title">Available Foreclosed Properties</div>
     <div class="section-divider"></div>
-    <p class="section-subtitle">Below is a comprehensive list of bank-foreclosed, government-acquired, and repossessed properties currently available in Baguio City. Prices are in Philippine Pesos (â‚±). All properties are sold on an "as-is, where-is" basis.</p>
-  </section>
+    <p class="section-subtitle">Click any property card for details. Filter, search, and sort below.</p>
 
-  <!-- BSP Property Spotlight -->
-  <section class="section" style="padding-top:0">
-    <div style="background: linear-gradient(135deg, #f8f4e8 0%, #fff 100%); border-radius: 20px; padding: 2rem; border: 1px solid #e8ddd0;">
-      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-        <span style="background: #1a1a2e; color: #f0c040; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">FEATURED</span>
-        <span style="color: #888; font-size: 0.85rem;">Bangko Sentral ng Pilipinas (BSP) Acquired Asset</span>
-      </div>
-      <h2 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.5rem;">Cliff Drive Residential Lot â€” Loakan, Baguio</h2>
-      <p style="color: #555; margin-bottom: 0.75rem;">Lot 10-C-1-G-3-A-1-A, Cliff Drive, Purok Ongasan, Barangay Loakan, Baguio City</p>
-      <div style="font-size: 1.8rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.75rem;">â‚±4,095,000</div>
-      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
-        <span class="property-detail">TCT No. 018-2018000888</span>
-        <span class="property-detail">Residential</span>
-        <span class="property-detail">Cash Basis</span>
-        <span class="property-detail">As-is, Where-is</span>
-      </div>
-      <p style="color: #666; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
-        This BSP-acquired property is available for negotiated sale. Buyer must tender at least 20% deposit of the offer price. For inquiries, contact <strong>Manolito V. Coronado Jr.</strong> at <a href="mailto:CoronadoVM@bsp.gov.ph" style="color: #1a1a2e; font-weight: 500;">CoronadoVM@bsp.gov.ph</a> or call (02) 5306-3422.
-      </p>
-
+    <div class="controls-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search by location, title, or keyword...">
+      <div class="filter-group" id="sourceFilters"></div>
+      <div class="filter-group" id="typeFilters"></div>
+      <select class="sort-select" id="sortSelect">
+        <option value="default">Default order</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="name">Name: A-Z</option>
+      </select>
+      <div class="result-count" id="resultCount">Showing <strong>0</strong> properties</div>
     </div>
+
+    <div class="property-grid" id="propertyGrid"></div>
   </section>
 
-  <!-- New Property Sources -->
-  <section class="section" style="padding-top:0">
-    <div class="section-title">More Foreclosure Sources</div>
+  <section class="map-section">
+    <div class="section-title">Property Map</div>
     <div class="section-divider"></div>
-    <p class="section-subtitle">Additional banks and institutions with foreclosed property inventories in Baguio City. Contact them directly to inquire about current listings and bidding procedures.</p>
-
-    <div class="property-grid">
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¦ Bank</div><span class="property-badge">EastWest Bank</span></div>
-        <div class="property-body">
-          <div class="property-type">EasySale Program</div>
-          <div class="property-title">Various Properties in Baguio</div>
-          <div class="property-location">Baguio City</div>
-          <div class="property-price">Check Online Portal</div>
-          <div class="property-details">
-            <span class="property-detail">EastWest EasySale</span>
-            <span class="property-detail">Search Online</span>
-          </div>
-          <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">Browse EastWest's EasySale inventory online. Contact their sales team for current Baguio listings and finder fee arrangements.</p>
-          <a class="property-contact" href="mailto:reproperties@eastwestbanker.com">Inquire</a>
-          <div class="property-source">Contact: reproperties@eastwestbanker.com / 0999 8857830</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¦ Bank</div><span class="property-badge">Metrobank</span></div>
-        <div class="property-body">
-          <div class="property-type">Acquired Assets</div>
-          <div class="property-title">Aurora Hill &amp; Other Areas</div>
-          <div class="property-location">Baguio City</div>
-          <div class="property-price">Check Online Portal</div>
-          <div class="property-details">
-            <span class="property-detail">Metrobank AAMDD</span>
-            <span class="property-detail">Negotiated Sale</span>
-          </div>
-          <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">Metrobank lists foreclosed properties including residential lots in Aurora Hill. Contact their marketing officer for current inventory.</p>
-          <a class="property-contact" href="mailto:goldamier.galorio@metrobank.com.ph">Inquire</a>
-          <div class="property-source">Contact: goldamier.galorio@metrobank.com.ph / (02) 8830-6204</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¦ Bank</div><span class="property-badge">China Bank</span></div>
-        <div class="property-body">
-          <div class="property-type">Acquired Assets for Sale</div>
-          <div class="property-title">Provincial Real Estate</div>
-          <div class="property-location">Baguio City &amp; Benguet</div>
-          <div class="property-price">Check Online Portal</div>
-          <div class="property-details">
-            <span class="property-detail">China Bank</span>
-            <span class="property-detail">As-is, Where-is</span>
-          </div>
-          <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">China Bank maintains an acquired assets portal. Listings for Baguio and Benguet properties are available on their website.</p>
-          <a class="property-contact" href="https://www.chinabank.ph/acquired-assets-for-sale" target="_blank">View Online</a>
-          <div class="property-source">Source: chinabank.ph/acquired-assets-for-sale</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ›ï¸ Government</div><span class="property-badge">GSIS</span></div>
-        <div class="property-body">
-          <div class="property-type">LWOB Program</div>
-          <div class="property-title">17 Properties in Baguio</div>
-          <div class="property-location">Baguio City</div>
-          <div class="property-price">Lease with Option to Buy</div>
-          <div class="property-details">
-            <span class="property-detail">GSIS</span>
-            <span class="property-detail">Negotiated</span>
-          </div>
-          <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">GSIS has 17 properties in Baguio under the Lease with Option to Buy (LWOB) program. Contact the GSIS office for pricing and availability.</p>
-          <div class="property-source">Contact: GSIS Baguio Office / gsis.gov.ph</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¦ Bank</div><span class="property-badge">RCBC</span></div>
-        <div class="property-body">
-          <div class="property-type">Disposed Properties</div>
-          <div class="property-title">Various Baguio Properties</div>
-          <div class="property-location">Baguio City</div>
-          <div class="property-price">Public Auction</div>
-          <div class="property-details">
-            <span class="property-detail">RCBC</span>
-            <span class="property-detail">As-is, Where-is</span>
-          </div>
-          <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">RCBC sells foreclosed properties through public auctions. Download their latest property listing from their website.</p>
-          <div class="property-source">Source: RCBC Properties for Auction website</div>
-        </div>
-      </div>
-    </div>
+    <p class="section-subtitle">Approximate locations of featured properties in Baguio City.</p>
+    <div id="property-map"></div>
   </section>
 
-  <!-- Pag-IBIG Acquired Assets -->
-  <section class="section" style="padding-top:0">
-    <div class="section-title">Pag-IBIG Acquired Assets</div>
-    <div class="section-divider"></div>
-    <p class="section-subtitle">Bid online through the Pag-IBIG Online Public Auction (OPA) platform. Register at <a href="https://www.pagibigfundservices.com/OnlinePublicAuction/" target="_blank">pagibigfundservices.com</a> to obtain a Buyer Number.</p>
-
-    <div class="property-grid">
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ“‹ Lot</div><span class="property-badge">Negotiated Sale</span></div>
-        <div class="property-body">
-          <div class="property-type">Residential Lot</div>
-          <div class="property-title">Santo Tomas Proper</div>
-          <div class="property-location">C.C.O.D.A. Subdivision, Baguio City</div>
-          <div class="property-price">â‚±1,110,000 â€“ â‚±1,320,000</div>
-          <div class="property-details">
-            <span class="property-detail">Pag-IBIG</span>
-          </div>
-          <div class="property-source">Source: Pag-IBIG Fund Acquired Assets</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¢ Condo</div><span class="property-badge">Negotiated Sale</span></div>
-        <div class="property-body">
-          <div class="property-type">Condominium Unit</div>
-          <div class="property-title">North Cambridge Wharton, Bakakeng Norte</div>
-          <div class="property-location">Unit 3F-20, Baguio City</div>
-          <div class="property-price">â‚±2,365,200</div>
-          <div class="property-details">
-            <span class="property-detail">Pag-IBIG</span>
-          </div>
-          <div class="property-source">Source: Pag-IBIG Fund Acquired Assets</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¢ Condo</div><span class="property-badge">Negotiated Sale</span></div>
-        <div class="property-body">
-          <div class="property-type">Condominium Unit</div>
-          <div class="property-title">3rd The Court, Ambiong</div>
-          <div class="property-location">CY-M2-B3-3BF-002, Baguio City</div>
-          <div class="property-price">â‚±5,250,000</div>
-          <div class="property-details">
-            <span class="property-detail">Pag-IBIG</span>
-          </div>
-          <div class="property-source">Source: Pag-IBIG Fund Acquired Assets</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¢ Condo</div><span class="property-badge">Available</span></div>
-        <div class="property-body">
-          <div class="property-type">Condominium Unit</div>
-          <div class="property-title">North Cambridge Princeton, Bakakeng Norte</div>
-          <div class="property-location">Unit GF-J &amp; Unit 2-LGF, Baguio City</div>
-          <div class="property-price">â‚±1,653,750 â€“ â‚±1,860,000</div>
-          <div class="property-details">
-            <span class="property-detail">Pag-IBIG</span>
-          </div>
-          <div class="property-source">Source: acquiredassets.ph</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Bank Foreclosures -->
-  <section class="section" style="padding-top:0">
-    <div class="section-title">Bank Foreclosed Properties</div>
-    <div class="section-divider"></div>
-    <p class="section-subtitle">Properties repossessed by major Philippine banks. Contact the respective bank's asset management division for bidding details.</p>
-
-    <div class="property-grid">
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸžï¸ Lot</div><span class="property-badge">Security Bank</span></div>
-        <div class="property-body">
-          <div class="property-type">Residential Lot</div>
-          <div class="property-title">Bakakeng Central, Crystal Cave</div>
-          <div class="property-location">Bakakeng Central, District 14, Baguio City</div>
-          <div class="property-price">â‚±28,171,000</div>
-          <div class="property-details">
-            <span class="property-detail">2,667 sqm</span>
-            <span class="property-detail">Security Bank</span>
-          </div>
-          <a class="property-contact" href="mailto:NPinson@securitybank.com">Inquire</a>
-          <div class="property-source">Contact: NPinson@securitybank.com</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ  House</div><span class="property-badge">Claire Miyabi</span></div>
-        <div class="property-body">
-          <div class="property-type">House &amp; Lot</div>
-          <div class="property-title">Ferguson Road / Andres Bonifacio</div>
-          <div class="property-location">Baguio City</div>
-          <div class="property-price">â‚±16,000,000</div>
-          <div class="property-details">
-            <span class="property-detail">240 sqm lot</span>
-            <span class="property-detail">Claire Miyabi</span>
-          </div>
-          <a class="property-contact" href="mailto:admin@miyabirealty.com">Inquire</a>
-          <div class="property-source">Contact: admin@miyabirealty.com</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸžï¸ Lot</div><span class="property-badge">MSG Realty</span></div>
-        <div class="property-body">
-          <div class="property-type">Residential Lot</div>
-          <div class="property-title">San Luis Village, Asin Road</div>
-          <div class="property-location">Ref: MSG-44-0620, Baguio City</div>
-          <div class="property-price">â‚±10,125,000</div>
-          <div class="property-details">
-            <span class="property-detail">15,000 sqm</span>
-            <span class="property-detail">My Saving Grace Realty</span>
-          </div>
-          <a class="property-contact" href="mailto:info@msg-homes.com">Inquire</a>
-          <div class="property-source">Contact: info@msg-homes.com</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¢ Condo</div><span class="property-badge">BDO</span></div>
-        <div class="property-body">
-          <div class="property-type">Condominium Unit</div>
-          <div class="property-title">Ciudad Grande Subdivision, Bakakeng North</div>
-          <div class="property-location">Donya Aurora Drive, Baguio City</div>
-          <div class="property-price">â‚±1,650,000</div>
-          <div class="property-details">
-            <span class="property-detail">15 sqm</span>
-            <span class="property-detail">BDO Assets</span>
-          </div>
-          <a class="property-contact" href="mailto:retailsales@bdo.com.ph">Inquire</a>
-          <div class="property-source">Contact: retailsales@bdo.com.ph</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸžï¸ Lots</div><span class="property-badge">BPI / Buena Mano</span></div>
-        <div class="property-body">
-          <div class="property-type">Residential Lots (Multiple)</div>
-          <div class="property-title">Fairview / Sunnyside Subdivision</div>
-          <div class="property-location">L3-L10 B8, Baguio City</div>
-          <div class="property-price">â‚±413,920 â€“ â‚±416,000 each</div>
-          <div class="property-details">
-            <span class="property-detail">~800 sqm each</span>
-            <span class="property-detail">Buena Mano</span>
-          </div>
-          <a class="property-contact" href="mailto:buenamano@bpi.com.ph">Inquire</a>
-          <div class="property-source">Contact: buenamano@bpi.com.ph</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ  House</div><span class="property-badge">BPI / Buena Mano</span></div>
-        <div class="property-body">
-          <div class="property-type">House &amp; Lot</div>
-          <div class="property-title">Bermuda Hills Subdivision</div>
-          <div class="property-location">Baguio City</div>
-          <div class="property-price">â‚±12,700,000</div>
-          <div class="property-details">
-            <span class="property-detail">BPI Foreclosed</span>
-            <span class="property-detail">High Equity</span>
-          </div>
-          <a class="property-contact" href="mailto:buenamano@bpi.com.ph">Inquire</a>
-          <div class="property-source">Contact: buenamano@bpi.com.ph</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸ¢ Condo</div><span class="property-badge">BPI</span></div>
-        <div class="property-body">
-          <div class="property-type">Condominium Unit</div>
-          <div class="property-title">Megatower Residences</div>
-          <div class="property-location">Near SM City Baguio, Baguio City</div>
-          <div class="property-price">Price upon inquiry</div>
-          <div class="property-details">
-            <span class="property-detail">BPI Foreclosed</span>
-            <span class="property-detail">Prime Location</span>
-          </div>
-          <a class="property-contact" href="mailto:buenamano@bpi.com.ph">Inquire</a>
-          <div class="property-source">Contact: buenamano@bpi.com.ph</div>
-        </div>
-      </div>
-
-      <div class="property-card">
-        <div class="property-image"><div class="no-image">ðŸžï¸ Lot</div><span class="property-badge">PNB</span></div>
-        <div class="property-body">
-          <div class="property-type">Residential Lot</div>
-          <div class="property-title">Balacbac Road</div>
-          <div class="property-location">Brgy. Balacbac, Baguio City</div>
-          <div class="property-price">Price upon inquiry</div>
-          <div class="property-details">
-            <span class="property-detail">996 sqm</span>
-            <span class="property-detail">PNB</span>
-          </div>
-          <a class="property-contact" href="mailto:tubiganeb@pnb.com.ph">Inquire</a>
-          <div class="property-source">Contact: tubiganeb@pnb.com.ph</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Additional Listings -->
-  <section class="section" style="padding-top:0">
-    <div class="section-title">Additional Foreclosure Listings</div>
-    <div class="section-divider"></div>
-    <p class="section-subtitle">More foreclosed properties sourced from various real estate platforms. Contact agents directly for viewing and bidding.</p>
-
-    <div style="overflow-x:auto;">
-      <table style="width:100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-        <thead>
-          <tr style="background: #1a1a2e; color: #fff;">
-            <th style="padding: 1rem; text-align: left; font-size: 0.85rem;">Property</th>
-            <th style="padding: 1rem; text-align: left; font-size: 0.85rem;">Location</th>
-            <th style="padding: 1rem; text-align: left; font-size: 0.85rem;">Price (â‚±)</th>
-            <th style="padding: 1rem; text-align: left; font-size: 0.85rem;">Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 1rem; font-weight: 500;">House (25BR)</td>
-            <td style="padding: 1rem; color: #666;">SLU-SVP Housing Village</td>
-            <td style="padding: 1rem; font-weight: 600;">19,215,000</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #eee; background: #f8f9fa;">
-            <td style="padding: 1rem; font-weight: 500;">House</td>
-            <td style="padding: 1rem; color: #666;">Dominican Hillâ€“Mirador</td>
-            <td style="padding: 1rem; font-weight: 600;">7,170,000</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 1rem; font-weight: 500;">Townhouse (4BR)</td>
-            <td style="padding: 1rem; color: #666;">Pacdal / Brentwood Village</td>
-            <td style="padding: 1rem; font-weight: 600;">5,959,700</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #eee; background: #f8f9fa;">
-            <td style="padding: 1rem; font-weight: 500;">House</td>
-            <td style="padding: 1rem; color: #666;">Irisan</td>
-            <td style="padding: 1rem; font-weight: 600;">8,340,000</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 1rem; font-weight: 500;">House (4BR)</td>
-            <td style="padding: 1rem; color: #666;">Camp 7</td>
-            <td style="padding: 1rem; font-weight: 600;">5,590,000</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #eee; background: #f8f9fa;">
-            <td style="padding: 1rem; font-weight: 500;">House</td>
-            <td style="padding: 1rem; color: #666;">Lexberville, Sto. Tomas</td>
-            <td style="padding: 1rem; font-weight: 600;">8,800,000</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 1rem; font-weight: 500;">House (5BR)</td>
-            <td style="padding: 1rem; color: #666;">Middle Quezon Hill</td>
-            <td style="padding: 1rem; font-weight: 600;">6,070,000</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #eee; background: #f8f9fa;">
-            <td style="padding: 1rem; font-weight: 500;">Lot w/ Improvement</td>
-            <td style="padding: 1rem; color: #666;">San Luis Village</td>
-            <td style="padding: 1rem; font-weight: 600;">4,410,000</td>
-            <td style="padding: 1rem; color: #888;">Cari / Dotproperty</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- CTA -->
   <section class="cta-section">
     <h2>Interested in a Property?</h2>
     <p>Contact the respective bank or agent directly using the information provided above. For BSP, Pag-IBIG, and GSIS properties, follow their official procedures.</p>
-    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">ðŸ“§ Have a specific inquiry? Call or email us: <a href="mailto:tipopalilio@gmail.com" style="color: #f0c040; text-decoration: none;">tipopalilio@gmail.com</a></p>
-    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; font-size: 0.85rem;">
-      <span style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 8px;">BPI: ebsabutan1@bpi.com.ph</span>
-      <span style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 8px;">BSP: CoronadoVM@bsp.gov.ph</span>
-      <span style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 8px;">EastWest: reproperties@eastwestbanker.com</span>
-      <span style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 8px;">Metrobank: goldamier.galorio@metrobank.com.ph</span>
-    </div>
+    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">Have a specific inquiry? Call or email us: <a href="mailto:tipopalilio@gmail.com" style="color: #f0c040; text-decoration: none;">tipopalilio@gmail.com</a></p>
   </section>
 
 </div>
@@ -724,11 +235,279 @@
   <p style="margin-top: 0.5rem; font-size: 0.8rem;">Information is sourced from bank and government websites. Prices and availability subject to change. Verify all details with the respective institution.</p>
 </footer>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+const properties = [
+  { id: 'bsp-cliff', title: 'Cliff Drive Residential Lot', location: 'Purok Ongasan, Brgy. Loakan, Baguio City', price: 4095000, type: 'Lot', source: 'BSP', area: '', description: 'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit.', contact: 'CoronadoVM@bsp.gov.ph', contactName: 'Manolito V. Coronado Jr.', phone: '(02) 5306-3422', featured: true, lat: 16.411, lng: 120.622 },
+  { id: 'bpi-sunnyside', title: 'Sunnyside Residential Lots (L3-L10 B8)', location: 'Fairview / Sunnyside Subdivision, Baguio City', price: 416000, type: 'Lot', source: 'BPI', area: '~800 sqm each', description: 'Multiple residential lots available through Buena Mano program.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.395, lng: 120.575 },
+  { id: 'bpi-sunnyside-2', title: 'Sunnyside Lot (L3 B8)', location: 'Sunnyside Subdivision, Brgy. Fairview, Baguio City', price: 416000, type: 'Lot', source: 'BPI', area: '~800 sqm', description: 'Foreclosed lot in Sunnyside Subdivision. Sold as-is, where-is.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.394, lng: 120.574 },
+  { id: 'bpi-bermuda', title: 'Bermuda Hills House & Lot', location: 'Bermuda Hills Subdivision, Baguio City', price: 12700000, type: 'House', source: 'BPI', area: '', description: 'Foreclosed house and lot property. High equity required.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.388, lng: 120.565 },
+  { id: 'bpi-megatower', title: 'Megatower Residences Condo', location: 'Near SM City Baguio, Baguio City', price: 0, type: 'Condo', source: 'BPI', area: '', description: 'Prime location condominium unit. Price upon inquiry.', contact: 'buenamano@bpi.com.ph', contactName: 'BPI Buena Mano', phone: '', lat: 16.401, lng: 120.598 },
+  { id: 'security-bank', title: 'Bakakeng Central Lot', location: 'Crystal Cave, Bakakeng Central, District 14, Baguio City', price: 28171000, type: 'Lot', source: 'Security Bank', area: '2,667 sqm', description: 'Large residential lot in Bakakeng Central area.', contact: 'NPinson@securitybank.com', contactName: 'N. Pinson', phone: '', lat: 16.418, lng: 120.602 },
+  { id: 'miyabi', title: 'Ferguson Road House & Lot', location: 'Ferguson Road / Andres Bonifacio, Baguio City', price: 16000000, type: 'House', source: 'Claire Miyabi', area: '240 sqm lot', description: 'House and lot in prime Baguio location.', contact: 'admin@miyabirealty.com', contactName: 'Claire Miyabi', phone: '+63 9505870775', lat: 16.409, lng: 120.608 },
+  { id: 'msg', title: 'San Luis Village Lot', location: 'Asin Road, Baguio City', price: 10125000, type: 'Lot', source: 'MSG Realty', area: '15,000 sqm', description: 'Expansive lot in San Luis Village. Ref: MSG-44-0620.', contact: 'info@msg-homes.com', contactName: 'MSG Realty', phone: '', lat: 16.382, lng: 120.55 },
+  { id: 'bdo', title: 'Ciudad Grande Condo', location: 'Donya Aurora Drive, Bakakeng North, Baguio City', price: 1650000, type: 'Condo', source: 'BDO', area: '15 sqm', description: 'Condominium unit in Ciudad Grande Subdivision.', contact: 'retailsales@bdo.com.ph', contactName: 'BDO Assets', phone: '', lat: 16.42, lng: 120.605 },
+  { id: 'pnb', title: 'Balacbac Road Lot', location: 'Brgy. Balacbac, Baguio City', price: 0, type: 'Lot', source: 'PNB', area: '996 sqm', description: 'Residential lot along Balacbac Road. Price upon inquiry.', contact: 'tubiganeb@pnb.com.ph', contactName: 'PNB CAR Region', phone: '', lat: 16.43, lng: 120.59 },
+  { id: 'pagibig-sto-tomas', title: 'Santo Tomas Lot', location: 'C.C.O.D.A. Subdivision, Baguio City', price: 1215000, type: 'Lot', source: 'Pag-IBIG', area: '', description: 'Negotiated sale residential lot in Santo Tomas Proper.', contact: 'pagibigfundservices.com', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.365, lng: 120.56 },
+  { id: 'pagibig-wharton', title: 'North Cambridge Wharton Condo', location: 'Unit 3F-20, Bakakeng Norte, Baguio City', price: 2365200, type: 'Condo', source: 'Pag-IBIG', area: '', description: 'Condominium unit in North Cambridge Wharton.', contact: 'pagibigfundservices.com', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.416, lng: 120.6 },
+  { id: 'pagibig-court', title: '3rd The Court Condo', location: 'CY-M2-B3-3BF-002, Ambiong, Baguio City', price: 5250000, type: 'Condo', source: 'Pag-IBIG', area: '', description: 'Condominium unit at 3rd The Court, Ambiong.', contact: 'pagibigfundservices.com', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.404, lng: 120.582 },
+  { id: 'pagibig-princeton', title: 'North Cambridge Princeton Condo', location: 'Unit GF-J & Unit 2-LGF, Bakakeng Norte, Baguio City', price: 1756875, type: 'Condo', source: 'Pag-IBIG', area: '', description: 'Available condominium units in North Cambridge Princeton.', contact: 'acquiredassets.ph', contactName: 'Pag-IBIG Fund', phone: '', lat: 16.417, lng: 120.601 },
+  { id: 'ew-eastwest', title: 'EastWest EasySale Properties', location: 'Various locations, Baguio City', price: 0, type: 'Various', source: 'EastWest', area: '', description: 'Various foreclosed properties under EastWest EasySale Program. Browse online portal for current listings.', contact: 'reproperties@eastwestbanker.com', contactName: 'EastWest Bank', phone: '0999 8857830', lat: 16.412, lng: 120.595 },
+  { id: 'metro-aurora', title: 'Aurora Hill Lot (Metrobank)', location: 'Aurora Hill & Other Areas, Baguio City', price: 0, type: 'Lot', source: 'Metrobank', area: '', description: 'Foreclosed properties including residential lots in Aurora Hill. Contact marketing officer for inventory.', contact: 'goldamier.galorio@metrobank.com.ph', contactName: 'Metrobank AAMDD', phone: '(02) 8830-6204', lat: 16.407, lng: 120.59 },
+  { id: 'china-bank', title: 'China Bank Acquired Assets', location: 'Baguio City & Benguet Province', price: 0, type: 'Various', source: 'China Bank', area: '', description: 'China Bank acquired assets for sale. Visit their online portal.', contact: 'chinabank.ph/acquired-assets-for-sale', contactName: 'China Bank', phone: '', lat: 16.403, lng: 120.587 },
+  { id: 'gsis-lwob', title: 'GSIS LWOB Properties (17 units)', location: 'Various locations, Baguio City', price: 0, type: 'Various', source: 'GSIS', area: '', description: '17 properties in Baguio under Lease with Option to Buy (LWOB) program.', contact: 'gsisrpamdcst@gsis.gov.ph', contactName: 'GSIS RPAMD', phone: '', lat: 16.41, lng: 120.592 },
+  { id: 'rcbc-auction', title: 'RCBC Disposed Properties', location: 'Various locations, Baguio City', price: 0, type: 'Various', source: 'RCBC', area: '', description: 'RCBC sells foreclosed properties through public auctions. Download latest listing from their website.', contact: 'epsilvestre@rcbc.com', contactName: 'RCBC', phone: '', lat: 16.406, lng: 120.596 },
+  { id: 'cari-sluh', title: 'SLU-SVP Housing Village House', location: 'SLU-SVP Housing Village, Baguio City', price: 19215000, type: 'House', source: 'Cari / Dotproperty', area: '25BR', description: 'Large house in SLU-SVP Housing Village.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.38, lng: 120.57 },
+  { id: 'cari-dominican', title: 'Dominican Hill House', location: 'Dominican Hill–Mirador, Baguio City', price: 7170000, type: 'House', source: 'Cari / Dotproperty', area: '', description: 'House in Dominican Hill-Mirador area.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.396, lng: 120.589 },
+  { id: 'cari-pacdal', title: 'Pacdal Townhouse', location: 'Pacdal / Brentwood Village, Baguio City', price: 5959700, type: 'Townhouse', source: 'Cari / Dotproperty', area: '4BR', description: 'Townhouse in Pacdal / Brentwood Village.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.399, lng: 120.578 },
+  { id: 'cari-irisan', title: 'Irisan House', location: 'Irisan, Baguio City', price: 8340000, type: 'House', source: 'Cari / Dotproperty', area: '', description: 'House in Irisan area.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.36, lng: 120.53 },
+  { id: 'cari-camp7', title: 'Camp 7 House', location: 'Camp 7, Baguio City', price: 5590000, type: 'House', source: 'Cari / Dotproperty', area: '4BR', description: 'House in Camp 7 area.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.375, lng: 120.58 },
+  { id: 'cari-sto-tomas', title: 'Lexberville House', location: 'Lexberville, Sto. Tomas, Baguio City', price: 8800000, type: 'House', source: 'Cari / Dotproperty', area: '', description: 'House in Lexberville, Sto. Tomas.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.358, lng: 120.555 },
+  { id: 'cari-quezon-hill', title: 'Middle Quezon Hill House', location: 'Middle Quezon Hill, Baguio City', price: 6070000, type: 'House', source: 'Cari / Dotproperty', area: '5BR', description: 'House in Middle Quezon Hill.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.385, lng: 120.562 },
+  { id: 'cari-san-luis', title: 'San Luis Village Lot', location: 'San Luis Village, Baguio City', price: 4410000, type: 'Lot', source: 'Cari / Dotproperty', area: 'w/ Improvement', description: 'Lot with improvement in San Luis Village.', contact: '', contactName: 'Cari / Dotproperty', phone: '', lat: 16.383, lng: 120.548 },
+];
 
+function formatPrice(p) {
+  if (!p || p === 0) return 'Price upon inquiry';
+  return '₱' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+const typeIcons = { 'Lot': '🏞️', 'House': '🏠', 'Condo': '🏢', 'Townhouse': '🏘️', 'Various': '📋' };
+const sourceColors = {
+  'BSP': '#8B0000', 'BPI': '#003D7A', 'Pag-IBIG': '#006847', 'Security Bank': '#002D62',
+  'Claire Miyabi': '#6A0DAD', 'MSG Realty': '#2E7D32', 'BDO': '#003D7A', 'PNB': '#1A237E',
+  'EastWest': '#B8860B', 'Metrobank': '#C41E3A', 'China Bank': '#8B0000', 'GSIS': '#4A148C',
+  'RCBC': '#D32F2F', 'Cari / Dotproperty': '#555555'
+};
+
+let filteredProperties = [...properties];
+let map = null;
+let markers = [];
+
+function getUniqueSources() { return [...new Set(properties.map(p => p.source))]; }
+function getUniqueTypes() { return [...new Set(properties.map(p => p.type))]; }
+
+function renderFilters() {
+  const sourceContainer = document.getElementById('sourceFilters');
+  const typeContainer = document.getElementById('typeFilters');
+
+  let sourceHTML = '<button class="filter-btn active" data-filter="source" data-value="all">All Sources</button>';
+  getUniqueSources().forEach(s => {
+    sourceHTML += `<button class="filter-btn" data-filter="source" data-value="${s}">${s}</button>`;
+  });
+  sourceContainer.innerHTML = sourceHTML;
+
+  let typeHTML = '<button class="filter-btn active" data-filter="type" data-value="all">All Types</button>';
+  getUniqueTypes().forEach(t => {
+    typeHTML += `<button class="filter-btn" data-filter="type" data-value="${t}">${t}</button>`;
+  });
+  typeContainer.innerHTML = typeHTML;
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const filter = this.dataset.filter;
+      const value = this.dataset.value;
+      document.querySelectorAll(`.filter-btn[data-filter="${filter}"]`).forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      applyFilters();
+    });
+  });
+}
+
+function applyFilters() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const activeSource = document.querySelector('.filter-btn.active[data-filter="source"]')?.dataset.value || 'all';
+  const activeType = document.querySelector('.filter-btn.active[data-filter="type"]')?.dataset.value || 'all';
+  const sort = document.getElementById('sortSelect').value;
+
+  filteredProperties = properties.filter(p => {
+    const matchSearch = !query || p.title.toLowerCase().includes(query) || p.location.toLowerCase().includes(query) || p.source.toLowerCase().includes(query) || p.type.toLowerCase().includes(query);
+    const matchSource = activeSource === 'all' || p.source === activeSource;
+    const matchType = activeType === 'all' || p.type === activeType;
+    return matchSearch && matchSource && matchType;
+  });
+
+  if (sort === 'price-asc') filteredProperties.sort((a, b) => (a.price || Infinity) - (b.price || Infinity));
+  else if (sort === 'price-desc') filteredProperties.sort((a, b) => (b.price || 0) - (a.price || 0));
+  else if (sort === 'name') filteredProperties.sort((a, b) => a.title.localeCompare(b.title));
+
+  renderProperties();
+  updateMap();
+}
+
+function renderProperties() {
+  const grid = document.getElementById('propertyGrid');
+  const count = document.getElementById('resultCount');
+
+  if (filteredProperties.length === 0) {
+    grid.innerHTML = '<div class="no-results"><h3>No properties found</h3><p>Try adjusting your search or filters.</p></div>';
+    count.innerHTML = 'Showing <strong>0</strong> properties';
+    return;
+  }
+
+  let html = '';
+  filteredProperties.forEach(p => {
+    const icon = typeIcons[p.type] || '📋';
+    const color = sourceColors[p.source] || '#555';
+    const priceDisplay = formatPrice(p.price);
+    const featuredTag = p.featured ? '<span class="property-badge">FEATURED</span>' : '';
+
+    html += `
+      <div class="property-card" data-id="${p.id}">
+        <div class="property-image" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
+          <span class="emoji-icon">${icon}</span>
+          ${featuredTag}
+          <span class="property-badge-source">${p.source}</span>
+        </div>
+        <div class="property-body">
+          <div class="property-type">${p.type}</div>
+          <div class="property-title">${p.title}</div>
+          <div class="property-location">${p.location}</div>
+          <div class="property-price">${priceDisplay}</div>
+          <div class="property-details">
+            ${p.area ? `<span class="property-detail">${p.area}</span>` : ''}
+            <span class="property-detail">${p.source}</span>
+          </div>
+          ${p.contact ? `<div class="property-source">Contact: ${p.contact}</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+  count.innerHTML = `Showing <strong>${filteredProperties.length}</strong> of <strong>${properties.length}</strong> properties`;
+
+  document.getElementById('stat-count').textContent = filteredProperties.length + '+';
+
+  grid.querySelectorAll('.property-card').forEach(card => {
+    card.addEventListener('click', function() {
+      const id = this.dataset.id;
+      const prop = properties.find(p => p.id === id);
+      if (prop) showPropertyModal(prop);
+    });
+  });
+}
+
+function showPropertyModal(prop) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px); display: flex; align-items: center;
+    justify-content: center; padding: 1.5rem; animation: fadeIn 0.2s ease;
+  `;
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    background: #fff; border-radius: 20px; max-width: 600px; width: 100%;
+    max-height: 85vh; overflow-y: auto; padding: 2rem; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: slideUp 0.25s ease;
+  `;
+
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.style.cssText = `
+    position: absolute; top: 12px; right: 16px; background: none; border: none;
+    font-size: 1.8rem; cursor: pointer; color: #999; line-height: 1;
+  `;
+  closeBtn.onclick = () => overlay.remove();
+
+  const icon = typeIcons[prop.type] || '📋';
+  const priceDisplay = formatPrice(prop.price);
+  const color = sourceColors[prop.source] || '#555';
+
+  modal.innerHTML = `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+      <span style="font-size:2.5rem">${icon}</span>
+      <div>
+        <span class="property-type">${prop.type}</span>
+        <div class="property-title" style="font-size:1.15rem">${prop.title}</div>
+      </div>
+    </div>
+    <div class="property-location" style="margin-bottom:0.75rem;">📍 ${prop.location}</div>
+    <div style="font-size:1.6rem;font-weight:700;color:#1a1a2e;margin-bottom:1rem;">${priceDisplay}</div>
+    <div class="property-details" style="margin-bottom:1rem;">
+      ${prop.area ? `<span class="property-detail">${prop.area}</span>` : ''}
+      <span class="property-detail" style="background:${color};color:#fff;">${prop.source}</span>
+    </div>
+    <p style="color:#555;font-size:0.9rem;line-height:1.7;margin-bottom:1.25rem;">${prop.description}</p>
+    ${prop.contactName ? `<p style="color:#888;font-size:0.85rem;margin-bottom:0.25rem;">Contact: <strong>${prop.contactName}</strong></p>` : ''}
+    ${prop.contact ? `<p style="color:#888;font-size:0.85rem;margin-bottom:0.25rem;">Email: <a href="mailto:${prop.contact}" style="color:#1a1a2e;font-weight:500;">${prop.contact}</a></p>` : ''}
+    ${prop.phone ? `<p style="color:#888;font-size:0.85rem;">Phone: ${prop.phone}</p>` : ''}
+    <div style="margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+      ${prop.contact && prop.contact.includes('@') ? `<a href="mailto:${prop.contact}" style="padding:0.6rem 1.5rem;background:#1a1a2e;color:#fff;border-radius:10px;text-decoration:none;font-size:0.85rem;font-weight:500;">Send Inquiry</a>` : ''}
+      <button onclick="this.closest('div[style]').parentElement.remove()" style="padding:0.6rem 1.5rem;background:transparent;color:#666;border:1px solid #ddd;border-radius:10px;cursor:pointer;font-size:0.85rem;font-family:inherit;">Close</button>
+    </div>
+  `;
+
+  modal.prepend(closeBtn);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function initMap() {
+  map = L.map('property-map', { zoomControl: true }).setView([16.402, 120.585], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+  updateMap();
+}
+
+function updateMap() {
+  if (!map) return;
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+
+  const shownIds = new Set(filteredProperties.map(p => p.id));
+  const toShow = properties.filter(p => shownIds.has(p.id) && p.lat && p.lng);
+
+  if (toShow.length === 0) return;
+
+  toShow.forEach(p => {
+    const color = sourceColors[p.source] || '#555';
+    const icon = L.divIcon({
+      html: `<div style="background:${color};color:#fff;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.2);">${typeIcons[p.type]||'📋'} ${formatPrice(p.price) === 'Price upon inquiry' ? 'Inquire' : formatPrice(p.price)}</div>`,
+      className: '', iconSize: [0, 0], iconAnchor: [40, 12]
+    });
+    const marker = L.marker([p.lat, p.lng], { icon }).addTo(map);
+    const priceDisplay = formatPrice(p.price);
+    marker.bindPopup(`
+      <div style="font-family:Inter,sans-serif;min-width:200px;">
+        <strong style="font-size:0.95rem;">${p.title}</strong>
+        <div style="color:#666;font-size:0.8rem;margin:4px 0;">${p.location}</div>
+        <div style="font-size:1.1rem;font-weight:700;color:#1a1a2e;margin:6px 0;">${priceDisplay}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0;">
+          <span style="background:#f0f2f5;padding:2px 8px;border-radius:4px;font-size:0.75rem;">${p.type}</span>
+          <span style="background:${color};color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;">${p.source}</span>
+        </div>
+        <button onclick="document.querySelector('[data-id=\\'${p.id}\\']')?.click()" style="margin-top:6px;padding:4px 12px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;">View Details</button>
+      </div>
+    `);
+    markers.push(marker);
+  });
+
+  if (toShow.length === 1) {
+    map.setView([toShow[0].lat, toShow[0].lng], 14);
+  } else {
+    const group = L.featureGroup(markers);
+    map.fitBounds(group.getBounds().pad(0.15));
+  }
+}
+
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('sortSelect').addEventListener('change', applyFilters);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove()); });
+
+renderFilters();
+applyFilters();
+initMap();
+
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+`;
+document.head.appendChild(style);
 </script>
 </body>
 </html>
-
-
-
