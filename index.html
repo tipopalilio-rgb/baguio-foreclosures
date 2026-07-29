@@ -237,21 +237,164 @@
     }
     .property-contact:hover { background: #f0c040; color: #1a1a2e; }
 
-    .bsp-gallery {
+    .gallery-section {
+      background: linear-gradient(135deg, #faf8f5 0%, #fff 100%);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid #e8e0d5;
+      margin: 2rem 0;
+    }
+    .gallery-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .gallery-badge {
+      background: #1a1a2e;
+      color: #f0c040;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .gallery-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: #1a1a2e;
+      margin-bottom: 0.25rem;
+    }
+    .gallery-subtitle {
+      color: #888;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
-      margin: 1.5rem 0;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
     }
-    .bsp-gallery img {
-      width: 100%;
-      height: 250px;
-      object-fit: cover;
+    .gallery-item {
+      position: relative;
       border-radius: 12px;
+      overflow: hidden;
       cursor: pointer;
-      transition: transform 0.2s;
+      background: #f0f0f0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      transition: transform 0.3s, box-shadow 0.3s;
+      aspect-ratio: 4/3;
     }
-    .bsp-gallery img:hover { transform: scale(1.02); }
+    .gallery-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s;
+    }
+    .gallery-item:hover img { transform: scale(1.05); }
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-label {
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .gallery-label span {
+      display: inline-block;
+      background: rgba(240,192,64,0.9);
+      color: #1a1a2e;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      backdrop-filter: blur(8px);
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      color: #fff;
+      font-size: 2.5rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      line-height: 1;
+      background: none;
+      border: none;
+    }
+    .lightbox-close:hover { opacity: 1; }
+    .lightbox-caption {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      background: rgba(0,0,0,0.5);
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+      background: rgba(0,0,0,0.3);
+      border: none;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+    }
+    .lightbox-nav:hover { opacity: 1; }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+
+    @media (max-width: 600px) {
+      .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+      .lightbox { padding: 1rem; }
+      .lightbox-close { top: 1rem; right: 1rem; font-size: 2rem; }
+      .lightbox-nav { font-size: 1.5rem; padding: 0.75rem 1rem; }
+    }
 
     .cta-section {
       background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
@@ -356,20 +499,60 @@
     </div>
   </section>
 
-      <div class="bsp-gallery" style="margin-top: 1.5rem;">
-        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.75rem;">BPI / Buena Mano — Sunnyside Lot Photos</h3>
-        <p style="color: #666; font-size: 0.85rem; margin-bottom: 1rem;">BPI/Buena Mano foreclosed lots in Sunnyside Subdivision, Fairview, Baguio City. Below are the actual property photos provided by BPI.</p>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-          <img src="images/bpi_sunnyside_01.png" alt="Sunnyside Lot L3 B8 - Photo 1" style="width: 100%; border-radius: 8px;">
-          <img src="images/bpi_sunnyside_02.png" alt="Sunnyside Lot L3 B8 - Photo 2" style="width: 100%; border-radius: 8px;">
-          <img src="images/bpi_sunnyside_03.png" alt="Sunnyside Lot L3 B8 - Photo 3" style="width: 100%; border-radius: 8px;">
-          <img src="images/bpi_sunnyside_04.png" alt="Sunnyside Lot L3 B8 - Photo 4" style="width: 100%; border-radius: 8px;">
-          <img src="images/bpi_sunnyside_05.png" alt="Sunnyside Lot L10 B8 - Photo 5" style="width: 100%; border-radius: 8px;">
-          <img src="images/bpi_sunnyside_06.png" alt="Sunnyside Lot L10 B8 - Photo 6" style="width: 100%; border-radius: 8px;">
-          <img src="images/bpi_sunnyside_07.png" alt="Sunnyside Lot - Photo 7" style="width: 100%; border-radius: 8px;">
-          <img src="images/bpi_sunnyside_08.png" alt="Sunnyside Lot - Photo 8" style="width: 100%; border-radius: 8px;">
+      <div class="gallery-section">
+        <div class="gallery-header">
+          <span class="gallery-badge">PHOTOS</span>
+          <span style="color: #888; font-size: 0.8rem;">BPI / Buena Mano — Provided by the bank</span>
         </div>
-        <p style="color: #999; font-size: 0.85rem; margin-top: 0.75rem;">L3 B8 & L10 B8, Sunnyside Subdivision, Brgy. Fairview, Baguio City — PHP 416,000 each. Contact: <a href="mailto:ebsabutan1@bpi.com.ph" style="color: #1a1a2e; font-weight: 500;">ebsabutan1@bpi.com.ph</a></p>
+        <h3 class="gallery-title">Sunnyside Subdivision, Fairview</h3>
+        <p class="gallery-subtitle">Actual property photos of Lots L3 B8 &amp; L10 B8 in Sunnyside Subdivision, Brgy. Fairview, Baguio City. Click any photo to view full size.</p>
+        <div class="gallery-grid" id="bpiGallery">
+          <div class="gallery-item" data-index="0">
+            <img src="images/bpi_sunnyside_01.png" alt="Sunnyside Lot L3 B8" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>L3 B8</span><br>Lot view 1</div></div>
+          </div>
+          <div class="gallery-item" data-index="1">
+            <img src="images/bpi_sunnyside_02.png" alt="Sunnyside Lot L3 B8" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>L3 B8</span><br>Lot view 2</div></div>
+          </div>
+          <div class="gallery-item" data-index="2">
+            <img src="images/bpi_sunnyside_03.png" alt="Sunnyside Lot L3 B8" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>L3 B8</span><br>Lot view 3</div></div>
+          </div>
+          <div class="gallery-item" data-index="3">
+            <img src="images/bpi_sunnyside_04.png" alt="Sunnyside Lot L3 B8" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>L3 B8</span><br>Lot view 4</div></div>
+          </div>
+          <div class="gallery-item" data-index="4">
+            <img src="images/bpi_sunnyside_05.png" alt="Sunnyside Lot L10 B8" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>L10 B8</span><br>Lot view 1</div></div>
+          </div>
+          <div class="gallery-item" data-index="5">
+            <img src="images/bpi_sunnyside_06.png" alt="Sunnyside Lot L10 B8" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>L10 B8</span><br>Lot view 2</div></div>
+          </div>
+          <div class="gallery-item" data-index="6">
+            <img src="images/bpi_sunnyside_07.png" alt="Sunnyside Lot" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>Site</span><br>Surroundings</div></div>
+          </div>
+          <div class="gallery-item" data-index="7">
+            <img src="images/bpi_sunnyside_08.png" alt="Sunnyside Lot" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-label"><span>Site</span><br>Area view</div></div>
+          </div>
+        </div>
+        <p style="color: #888; font-size: 0.85rem; margin-top: 1rem; text-align: center;">
+          L3 B8 &amp; L10 B8, Sunnyside Subdivision, Brgy. Fairview, Baguio City — ₱416,000 each<br>
+          Contact: <a href="mailto:ebsabutan1@bpi.com.ph" style="color: #1a1a2e; font-weight: 500;">ebsabutan1@bpi.com.ph</a>
+        </p>
+      </div>
+
+      <!-- Lightbox -->
+      <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev">&lsaquo;</button>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext">&rsaquo;</button>
+        <img id="lightboxImg" src="" alt="">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
       </div>
   </section>
 
@@ -757,5 +940,64 @@
   <p style="margin-top: 0.5rem; font-size: 0.8rem;">Information is sourced from bank and government websites. Prices and availability subject to change. Verify all details with the respective institution.</p>
 </footer>
 
+<script>
+(function() {
+  var gallery = document.getElementById('bpiGallery');
+  if (!gallery) return;
+  var items = gallery.querySelectorAll('.gallery-item');
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImg = document.getElementById('lightboxImg');
+  var lightboxCaption = document.getElementById('lightboxCaption');
+  var lightboxClose = document.getElementById('lightboxClose');
+  var lightboxPrev = document.getElementById('lightboxPrev');
+  var lightboxNext = document.getElementById('lightboxNext');
+  var currentIndex = 0;
+
+  function openLightbox(index) {
+    currentIndex = index;
+    var item = items[currentIndex];
+    var img = item.querySelector('img');
+    var label = item.querySelector('.gallery-label').innerText;
+    lightboxImg.src = img.src;
+    lightboxCaption.textContent = label;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function prevImage() {
+    currentIndex = (currentIndex - 1 + items.length) % items.length;
+    openLightbox(currentIndex);
+  }
+
+  function nextImage() {
+    currentIndex = (currentIndex + 1) % items.length;
+    openLightbox(currentIndex);
+  }
+
+  for (var i = 0; i < items.length; i++) {
+    items[i].addEventListener('click', openLightbox.bind(null, i));
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightboxPrev.addEventListener('click', prevImage);
+  lightboxNext.addEventListener('click', nextImage);
+
+  lightbox.addEventListener('click', function(e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') prevImage();
+    if (e.key === 'ArrowRight') nextImage();
+  });
+})();
+</script>
 </body>
 </html>
