@@ -194,6 +194,48 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--dark); color: #fff; padding: .8rem 1.5rem; border-radius: var(--radius); font-size: .88rem; font-weight: 500; z-index: 2000; opacity: 0; transition: transform .3s ease, opacity .3s ease; box-shadow: var(--shadow-lg); white-space: nowrap; }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+
+.updates-list { display: flex; flex-direction: column; gap: 1rem; }
+.update-card { display: flex; gap: 1.25rem; background: var(--bg-alt); border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border); transition: var(--transition); }
+.update-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.update-icon { font-size: 2rem; flex-shrink: 0; width: 48px; text-align: center; }
+.update-content { flex: 1; }
+.update-date { font-size: .75rem; color: var(--text-muted); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.update-content h4 { font-family: 'Inter'; font-size: .95rem; margin: .2rem 0 .3rem; }
+.update-content p { font-size: .85rem; color: var(--text-light); line-height: 1.6; }
+.update-tag { display: inline-block; background: var(--blue-light); color: var(--blue); font-size: .68rem; font-weight: 700; padding: .15rem .6rem; border-radius: 99px; margin-top: .4rem; }
+
+.ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.ref-card { text-align: center; padding: 2rem 1.5rem; background: var(--bg-alt); border-radius: var(--radius-lg); border: 1px solid var(--border); }
+.ref-card-icon { font-size: 2.2rem; margin-bottom: .8rem; }
+.ref-card h4 { font-family: 'Inter'; font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+.ref-rate { font-size: 2rem; font-weight: 800; color: var(--blue); font-family: 'Playfair Display', serif; margin: .5rem 0; }
+.ref-rate span { font-size: .9rem; color: var(--text-light); font-weight: 400; }
+.ref-card p { font-size: .82rem; color: var(--text-light); line-height: 1.6; }
+.ref-badge { display: inline-block; background: #d4edda; color: #155724; font-size: .68rem; font-weight: 700; padding: .2rem .7rem; border-radius: 99px; margin-bottom: .6rem; }
+
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.contact-info { display: flex; flex-direction: column; gap: 1.25rem; }
+.contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+.contact-item-icon { background: var(--blue-light); width: 44px; height: 44px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.contact-item h4 { font-family: 'Inter'; font-size: .9rem; font-weight: 700; margin-bottom: .15rem; }
+.contact-item p { font-size: .82rem; color: var(--text-light); }
+.contact-item a { color: var(--blue); font-weight: 500; }
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.contact-form input, .contact-form select, .contact-form textarea { width: 100%; padding: .75rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: .9rem; font-family: inherit; color: var(--dark); background: var(--bg); outline: none; transition: border-color .2s; }
+.contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--blue); }
+.contact-form textarea { resize: vertical; min-height: 100px; }
+.contact-form .btn { align-self: flex-start; }
+.form-note { font-size: .78rem; color: var(--text-muted); margin-top: -.5rem; }
+
+@media (max-width: 768px) {
+  .ref-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .update-card { flex-direction: column; align-items: flex-start; }
+}
+
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .hero { min-height: 75vh; }
@@ -218,8 +260,10 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
     <ul class="nav-links">
       <li><a href="#properties">Properties</a></li>
       <li><a href="#map">Map</a></li>
+      <li><a href="#updates">Updates</a></li>
+      <li><a href="#referral">Referral</a></li>
       <li><a href="#about">About</a></li>
-      <li><a href="mailto:tipopalilio@gmail.com" class="btn btn-sm btn-primary">Contact</a></li>
+      <li><a href="#contact" class="btn btn-sm btn-primary">Contact</a></li>
     </ul>
   </div>
 </nav>
@@ -343,6 +387,155 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
     </div>
   </section>
 
+  
+  <section class="section" id="updates">
+    <div class="section-header">
+      <div class="section-tag">Latest Updates</div>
+      <h2 class="section-title">Recent Bank Responses</h2>
+      <p class="section-sub">We're actively building partnerships with banks and government agencies. Here are the latest responses we've received.</p>
+    </div>
+    <div class="updates-list">
+      <div class="update-card reveal">
+        <div class="update-icon">🏦</div>
+        <div class="update-content">
+          <span class="update-date">July 30, 2026</span>
+          <h4>EastWest Bank — Broker Accreditation Invitation</h4>
+          <p>EastWest Bank reached out directly to invite Palico Realty to become an accredited broker partner. Commission rates: 5% for properties P5M and below, 4% for P5M-P10M, 3% for above P10M. We're now processing the accreditation requirements.</p>
+          <span class="update-tag">✅ Accredited Broker</span>
+          <span class="update-tag" style="background:#d4edda;color:#155724;">💰 Up to 5% Commission</span>
+        </div>
+      </div>
+      <div class="update-card reveal d1">
+        <div class="update-icon">💰</div>
+        <div class="update-content">
+          <span class="update-date">July 30, 2026</span>
+          <h4>RCBC — 3% Finder's Fee Confirmed</h4>
+          <p>RCBC confirmed they offer a 3% commission for brokers/referrers on disposed property sales. No formal accreditation needed — just refer a buyer who signs the purchase proposal with your co-signature. We've requested the current Baguio inventory list.</p>
+          <span class="update-tag">💰 3% Commission</span>
+          <span class="update-tag">📋 No Accreditation Needed</span>
+        </div>
+      </div>
+      <div class="update-card reveal d2">
+        <div class="update-icon">📜</div>
+        <div class="update-content">
+          <span class="update-date">July 30, 2026</span>
+          <h4>BSP — Broker Accreditation Path Available</h4>
+          <p>BSP confirmed they offer commissions for BSP-accredited Real Estate Brokers. While they don't pay non-accredited referral fees, we've been directed to their accreditation process and are pursuing registered broker status.</p>
+          <span class="update-tag">📝 Accreditation in Progress</span>
+          <span class="update-tag">🏛️ Government Properties</span>
+        </div>
+      </div>
+      <div class="update-card reveal d3">
+        <div class="update-icon">📊</div>
+        <div class="update-content">
+          <span class="update-date">July 29, 2026</span>
+          <h4>26 Properties Now Listed — More Coming</h4>
+          <p>Our platform now features 26 foreclosed properties across Baguio City from 14 different sources including BSP, BPI, Pag-IBIG, Metrobank, EastWest, Security Bank, RCBC, GSIS, and more. We're actively adding new listings as bank inventories become available.</p>
+          <span class="update-tag">🏠 26 Properties</span>
+          <span class="update-tag">🏛️ 14 Sources</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="referral">
+    <div class="section-header">
+      <div class="section-tag">Referral Program</div>
+      <h2 class="section-title">Earn Commission on Referrals</h2>
+      <p class="section-sub">Palico Realty has established partnerships with multiple banks. Refer a qualified buyer and earn competitive commissions.</p>
+    </div>
+    <div class="ref-grid">
+      <div class="ref-card reveal">
+        <div class="ref-card-icon">🏦</div>
+        <div class="ref-badge">Accredited Partner</div>
+        <h4>EastWest Bank</h4>
+        <div class="ref-rate">5% <span>≤ P5M</span></div>
+        <div class="ref-rate" style="font-size:1.5rem;">4% <span>P5M-P10M</span></div>
+        <div class="ref-rate" style="font-size:1.3rem;">3% <span>&gt; P10M</span></div>
+        <p>Accredited broker partnership. Submit requirements and start referring clients.</p>
+      </div>
+      <div class="ref-card reveal d1">
+        <div class="ref-card-icon">🏛️</div>
+        <div class="ref-badge">No Accreditation Needed</div>
+        <h4>RCBC</h4>
+        <div class="ref-rate">3% <span>Flat Rate</span></div>
+        <p>Simply refer a buyer who signs the purchase proposal with your co-signature. No formal accreditation process required.</p>
+      </div>
+      <div class="ref-card reveal d2">
+        <div class="ref-card-icon">📋</div>
+        <div class="ref-badge">Requirements</div>
+        <h4>How to Get Started</h4>
+        <p style="text-align:left;font-size:.82rem;line-height:1.8;">
+          1. Contact us to express interest<br>
+          2. For EastWest: submit accreditation form, valid IDs, PRC ID, BIR 2303<br>
+          3. For RCBC: just refer a buyer<br>
+          4. Co-sign the purchase proposal<br>
+          5. Earn commission upon sale
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="section-header">
+      <div class="section-tag">Get in Touch</div>
+      <h2 class="section-title">Send Us an Inquiry</h2>
+      <p class="section-sub">Looking for a specific property? Want to partner with us? Fill out the form below and we'll get back to you.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-item-icon">✉️</div>
+          <div>
+            <h4>Email</h4>
+            <p><a href="mailto:tipopalilio@gmail.com">tipopalilio@gmail.com</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">🌐</div>
+          <div>
+            <h4>Website</h4>
+            <p><a href="https://tipopalilio-rgb.github.io/baguio-foreclosures/">tipopalilio-rgb.github.io/baguio-foreclosures/</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">📍</div>
+          <div>
+            <h4>Location</h4>
+            <p>Baguio City, Philippines</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">🏦</div>
+          <div>
+            <h4>Property Sources</h4>
+            <p>BSP, BPI, Pag-IBIG, EastWest, RCBC, Metrobank, Security Bank, GSIS, PNB, BDO, China Bank, and more</p>
+          </div>
+        </div>
+      </div>
+      <form class="contact-form" onsubmit="submitInquiry(event)">
+        <div class="form-row">
+          <input type="text" id="inqName" placeholder="Your Name *" required>
+          <input type="email" id="inqEmail" placeholder="Your Email *" required>
+        </div>
+        <div class="form-row">
+          <input type="tel" id="inqPhone" placeholder="Phone Number (optional)">
+          <select id="inqType">
+            <option value="">I'm interested in...</option>
+            <option value="buying">Buying a Property</option>
+            <option value="referral">Becoming a Referral Partner</option>
+            <option value="accreditation">Broker Accreditation</option>
+            <option value="info">General Inquiry</option>
+          </select>
+        </div>
+        <textarea id="inqMessage" placeholder="Tell us what you're looking for — specific property, price range, location, or any questions... *" required></textarea>
+        <p class="form-note">This form opens your email client. Hit send to submit your inquiry.</p>
+        <button type="submit" class="btn btn-primary">✉️ Send Inquiry</button>
+      </form>
+    </div>
+  </section>
+
+
   <section class="cta-section">
     <h2>Ready to Invest in Baguio?</h2>
     <p>Contact the respective bank or agent directly using the details on each property. For BSP, Pag-IBIG, and GSIS, follow their official procedures.</p>
@@ -358,41 +551,30 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 </div>
 
 <footer class="footer">
-  <p><strong>Palico Realty</strong> &mdash; Baguio City Foreclosure Listings &bull; Updated July 2026</p>
+  <p><strong>Palico Realty</strong> &mdash; Baguio City Foreclosure Listings &bull; Updated July 30, 2026</p>
   <p style="margin-top:.4rem;">Information sourced from bank and government websites. Prices and availability subject to change.</p>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const properties = [
-  { id:'bsp-cliff', title:'Cliff Drive Residential Lot', location:'Purok Ongasan, Brgy. Loakan', price:4095000, type:'Lot', source:'BSP', area:'', desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price. For inquiries, contact Manolito V. Coronado Jr.', contact:'CoronadoVM@bsp.gov.ph', contactName:'Manolito V. Coronado Jr.', phone:'(02) 5306-3422', featured:true, lat:16.411, lng:120.622 },
-  { id:'bpi-sunnyside', title:'Sunnyside Residential Lots (L3-L10 B8)', location:'Fairview / Sunnyside Subdivision', price:416000, type:'Lot', source:'BPI', area:'~800 sqm each', desc:'Multiple residential lots available through the Buena Mano program. Sold as-is, where-is.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.395, lng:120.575 },
-  { id:'bpi-bermuda', title:'Bermuda Hills House & Lot', location:'Bermuda Hills Subdivision', price:12700000, type:'House', source:'BPI', area:'', desc:'Foreclosed house and lot property in Bermuda Hills. High equity required.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.388, lng:120.565 },
-  { id:'bpi-megatower', title:'Megatower Residences Condominium', location:'Near SM City Baguio', price:0, type:'Condo', source:'BPI', area:'', desc:'Prime location condominium unit near SM City Baguio. Price upon inquiry.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.401, lng:120.598 },
-  { id:'security-bank', title:'Bakakeng Central Lot — Crystal Cave', location:'Crystal Cave, Bakakeng Central', price:28171000, type:'Lot', source:'Security Bank', area:'2,667 sqm', desc:'Large residential lot in Bakakeng Central area.', contact:'NPinson@securitybank.com', contactName:'N. Pinson', phone:'', lat:16.418, lng:120.602 },
-  { id:'miyabi', title:'Ferguson Road House & Lot', location:'Ferguson Road / Andres Bonifacio', price:16000000, type:'House', source:'Claire Miyabi', area:'240 sqm lot', desc:'House and lot in prime Baguio location.', contact:'admin@miyabirealty.com', contactName:'Claire Miyabi', phone:'+63 9505870775', lat:16.409, lng:120.608 },
-  { id:'msg', title:'San Luis Village Lot — Asin Road', location:'Asin Road', price:10125000, type:'Lot', source:'MSG Realty', area:'15,000 sqm', desc:'Expansive lot in San Luis Village. Ref: MSG-44-0620.', contact:'info@msg-homes.com', contactName:'MSG Realty', phone:'', lat:16.382, lng:120.55 },
-  { id:'bdo', title:'Ciudad Grande Condominium Unit', location:'Bakakeng North', price:1650000, type:'Condo', source:'BDO', area:'15 sqm', desc:'Condominium unit in Ciudad Grande Subdivision.', contact:'retailsales@bdo.com.ph', contactName:'BDO Assets', phone:'', lat:16.42, lng:120.605 },
-  { id:'pnb', title:'Balacbac Road Residential Lot', location:'Brgy. Balacbac', price:0, type:'Lot', source:'PNB', area:'996 sqm', desc:'Residential lot along Balacbac Road. Price upon inquiry.', contact:'tubiganeb@pnb.com.ph', contactName:'PNB CAR Region', phone:'', lat:16.43, lng:120.59 },
-  { id:'pagibig-st', title:'Santo Tomas Lot — C.C.O.D.A.', location:'C.C.O.D.A. Subdivision', price:1215000, type:'Lot', source:'Pag-IBIG', area:'', desc:'Negotiated sale residential lot in Santo Tomas Proper.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.365, lng:120.56 },
-  { id:'pagibig-w', title:'North Cambridge Wharton Condo', location:'Unit 3F-20, Bakakeng Norte', price:2365200, type:'Condo', source:'Pag-IBIG', area:'', desc:'Condominium unit in North Cambridge Wharton.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.416, lng:120.6 },
-  { id:'pagibig-c', title:'3rd The Court Condominium — Ambiong', location:'CY-M2-B3-3BF-002, Ambiong', price:5250000, type:'Condo', source:'Pag-IBIG', area:'', desc:'Condominium unit at 3rd The Court, Ambiong.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.404, lng:120.582 },
-  { id:'pagibig-p', title:'North Cambridge Princeton Condo Units', location:'Bakakeng Norte', price:1756875, type:'Condo', source:'Pag-IBIG', area:'', desc:'Available units in North Cambridge Princeton.', contact:'acquiredassets.ph', contactName:'Pag-IBIG Fund', phone:'', lat:16.417, lng:120.601 },
-  { id:'ew', title:'EastWest EasySale Properties', location:'Various, Baguio City', price:0, type:'Various', source:'EastWest', area:'', desc:'Various foreclosed properties under the EasySale Program.', contact:'reproperties@eastwestbanker.com', contactName:'EastWest Bank', phone:'0999 8857830', lat:16.412, lng:120.595 },
-  { id:'metro', title:'Aurora Hill Residential Lot', location:'Aurora Hill', price:0, type:'Lot', source:'Metrobank', area:'', desc:'Foreclosed residential lot in Aurora Hill.', contact:'goldamier.galorio@metrobank.com.ph', contactName:'Metrobank AAMDD', phone:'(02) 8830-6204', lat:16.407, lng:120.59 },
-  { id:'china', title:'China Bank Acquired Assets', location:'Baguio City & Benguet', price:0, type:'Various', source:'China Bank', area:'', desc:'China Bank acquired assets for sale.', contact:'chinabank.ph/acquired-assets-for-sale', contactName:'China Bank', phone:'', lat:16.403, lng:120.587 },
-  { id:'gsis', title:'GSIS LWOB Properties (17 units)', location:'Various, Baguio City', price:0, type:'Various', source:'GSIS', area:'', desc:'17 properties under the Lease with Option to Buy program.', contact:'gsisrpamdcst@gsis.gov.ph', contactName:'GSIS RPAMD', phone:'', lat:16.41, lng:120.592 },
-  { id:'rcbc', title:'RCBC Disposed Properties', location:'Various, Baguio City', price:0, type:'Various', source:'RCBC', area:'', desc:'Foreclosed properties sold through public auctions.', contact:'epsilvestre@rcbc.com', contactName:'RCBC', phone:'', lat:16.406, lng:120.596 },
-  { id:'cari1', title:'SLU-SVP Housing Village (25BR)', location:'SLU-SVP Housing Village', price:19215000, type:'House', source:'Cari / Dotproperty', area:'25BR', desc:'Large house in SLU-SVP Housing Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.38, lng:120.57 },
-  { id:'cari2', title:'Dominican Hill–Mirador House', location:'Dominican Hill–Mirador', price:7170000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Dominican Hill-Mirador area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.396, lng:120.589 },
-  { id:'cari3', title:'Pacdal / Brentwood Townhouse (4BR)', location:'Pacdal / Brentwood Village', price:5959700, type:'Townhouse', source:'Cari / Dotproperty', area:'4BR', desc:'Townhouse in Pacdal / Brentwood Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.399, lng:120.578 },
-  { id:'cari4', title:'Irisan House', location:'Irisan', price:8340000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Irisan area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.36, lng:120.53 },
-  { id:'cari5', title:'Camp 7 House (4BR)', location:'Camp 7', price:5590000, type:'House', source:'Cari / Dotproperty', area:'4BR', desc:'House in Camp 7 area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.375, lng:120.58 },
-  { id:'cari6', title:'Lexberville House — Sto. Tomas', location:'Lexberville, Sto. Tomas', price:8800000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Lexberville, Sto. Tomas.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.358, lng:120.555 },
-  { id:'cari7', title:'Middle Quezon Hill House (5BR)', location:'Middle Quezon Hill', price:6070000, type:'House', source:'Cari / Dotproperty', area:'5BR', desc:'House in Middle Quezon Hill.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.385, lng:120.562 },
-  { id:'cari8', title:'San Luis Village Lot w/ Improvement', location:'San Luis Village', price:4410000, type:'Lot', source:'Cari / Dotproperty', area:'Improvement', desc:'Lot with improvement in San Luis Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.383, lng:120.548 }
-];
+let properties = [];
+let filtered = [];
+let map = null, mapMarkers = [], fullMap = null, fullMarkers = [];
 
+fetch('properties.json')
+  .then(r => r.json())
+  .then(data => {
+    properties = data;
+    populateFilters();
+    apply();
+    initFullMap();
+    document.getElementById('heroSources').textContent = [...new Set(properties.map(p=>p.source))].length;
+  })
+  .catch(() => {
+    document.getElementById('resultsCount').innerHTML = 'Failed to load properties';
+  });
+
+function fmt(p)
 function fmt(p) { return p ? '₱' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 'Price upon inquiry'; }
 
 const srcColors = {
@@ -652,11 +834,35 @@ window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.
 const ro = new IntersectionObserver(e => { e.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); ro.unobserve(en.target); }}); }, { threshold: 0.06 });
 document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-// Init
-populateFilters();
-apply();
-initFullMap();
-document.getElementById('heroSources').textContent = [...new Set(properties.map(p=>p.source))].length;
+// Init - properties now loaded from properties.json via fetch above
+
+
+// Contact form submit - compose email
+function submitInquiry(e) {
+  e.preventDefault();
+  const name = document.getElementById('inqName').value.trim();
+  const email = document.getElementById('inqEmail').value.trim();
+  const phone = document.getElementById('inqPhone').value.trim();
+  const type = document.getElementById('inqType').value;
+  const msg = document.getElementById('inqMessage').value.trim();
+
+  const subject = encodeURIComponent('Inquiry from ' + name + ' - Palico Realty');
+  let body = 'Name: ' + name + '\n';
+  body += 'Email: ' + email + '\n';
+  if (phone) body += 'Phone: ' + phone + '\n';
+  if (type) body += 'Interest: ' + type + '\n';
+  body += '\nMessage:\n' + msg;
+  body += '\n\n---\nSent from Palico Realty - Baguio Foreclosures';
+
+  window.location.href = 'mailto:tipopalilio@gmail.com?subject=' + subject + '&body=' + encodeURIComponent(body);
+
+  // Toast feedback
+  const t = document.getElementById('formToast');
+  t.textContent = '📧 Opening your email client...';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
 </script>
 </body>
 </html>
