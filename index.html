@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Baguio Foreclosures — Palico Realty</title>
+<meta name="description" content="Curated listings of bank-foreclosed and government-acquired properties in Baguio City. 26+ properties from BSP, BPI, Pag-IBIG, EastWest, RCBC, and more. Updated July 2026.">
+<meta name="keywords" content="Baguio foreclosures, bank foreclosed properties Baguio, Baguio real estate, Palico Realty, foreclosed lots Baguio, BSP acquired assets Baguio, Pag-IBIG acquired assets">
+<meta name="author" content="Palico Realty">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Baguio Foreclosures — Palico Realty">
+<meta property="og:description" content="Curated listings of bank-foreclosed and government-acquired properties in Baguio City. 26+ properties from 14 sources.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tipopalilio-rgb.github.io/baguio-foreclosures/">
+<meta property="og:locale" content="en_PH">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Baguio Foreclosures — Palico Realty">
+<meta name="twitter:description" content="Curated listings of bank-foreclosed and government-acquired properties in Baguio City.">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -256,16 +269,45 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
-.input-wrap { display: contents; }</style>
+.input-wrap { display: contents; }
+.nav-toggle { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 4px; margin-left: auto; }
+.nav-toggle span { display: block; width: 24px; height: 2.5px; background: #fff; border-radius: 2px; transition: var(--transition); }
+.nav.scrolled .nav-toggle span { background: var(--dark); }
+.nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+@media (max-width: 768px) {
+  .nav-toggle { display: flex; }
+  .nav-links { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,.98); flex-direction: column; justify-content: center; align-items: center; gap: 2rem; z-index: 99; }
+  .nav-links.open { display: flex; }
+  .nav-links a { font-size: 1.3rem; color: #fff !important; }
+  .nav-links .btn { margin-top: .5rem; }
+}
+</style>
 
 <text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>"><text y=%22.9em%22 font-size=%2290%22>%F0%9F%8F%A0</text></svg>">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%8C%82</text></svg>"></head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%8C%82</text></svg>">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "Palico Realty",
+  "description": "Baguio City foreclosure property listings from banks and government agencies.",
+  "url": "https://tipopalilio-rgb.github.io/baguio-foreclosures/",
+  "areaServed": { "@type": "City", "name": "Baguio City", "addressCountry": "PH" },
+  "contactPoint": { "@type": "ContactPoint", "email": "tipopalilio@gmail.com", "contactType": "sales" }
+}
+</script>
+</head>
 <body>
 
 <nav class="nav" id="nav">
   <div class="nav-inner">
     <div class="nav-logo">Palico <span>Realty</span></div>
-    <ul class="nav-links">
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
       <li><a href="#properties">Properties</a></li>
       <li><a href="#map">Map</a></li>
       <li><a href="#updates">Updates</a></li>
@@ -636,6 +678,16 @@ function populateFilters() {
 }
 
 function apply() {
+  // Update URL hash for shareable filters
+  var p = [];
+  ['filterSource','filterType','filterMin','filterMax','sortBy'].forEach(function(f) {
+    var el = document.getElementById(f);
+    if (el && el.value !== 'all' && el.value !== '0' && el.value !== '99999999' && el.value !== 'default') {
+      p.push(f + '=' + encodeURIComponent(el.value));
+    }
+  });
+  try { window.location.hash = p.join('&'); } catch(er) {}
+
   var q = document.getElementById('heroSearch').value.toLowerCase().trim();
   var src = document.getElementById('filterSource').value;
   var typ = document.getElementById('filterType').value;
@@ -701,6 +753,17 @@ function render() {
     h += '</div></div>';
   }
   g.innerHTML = h;
+  // Stagger card entrance
+  var ac = g.querySelectorAll('.property-card');
+  for (var ai = 0; ai < ac.length; ai++) {
+    (function(card, d) {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity .4s ease, transform .4s ease';
+      setTimeout(function() { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, d);
+    })(ac[ai], 30 + ai * 40);
+  }
+
   r.innerHTML = filtered.length + ' propert' + (filtered.length !== 1 ? 'ies' : 'y') + ' found';
   if (hc) hc.textContent = filtered.length;
 
@@ -887,6 +950,34 @@ function submitInquiry(e) {
 
 // ===== INIT =====
 (function init() {
+  // Hamburger toggle
+  var tog = document.getElementById('navToggle');
+  var links = document.getElementById('navLinks');
+  if (tog && links) {
+    tog.addEventListener('click', function() {
+      tog.classList.toggle('open');
+      links.classList.toggle('open');
+    });
+    links.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() {
+        tog.classList.remove('open');
+        links.classList.remove('open');
+      });
+    });
+  }
+
+  // Restore filters from URL hash
+  var h = window.location.hash.slice(1);
+  if (h) {
+    h.split('&').forEach(function(pair) {
+      var kv = pair.split('=');
+      if (kv.length === 2) {
+        var el = document.getElementById(kv[0]);
+        if (el) el.value = decodeURIComponent(kv[1]);
+      }
+    });
+  }
+
   // Hide loading spinner
   var gl = document.getElementById('gridLoading');
   if (gl) gl.style.display = 'none';
