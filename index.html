@@ -918,6 +918,7 @@ function submitInquiry(e) {
   var ro = new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting){en.target.classList.add('visible');ro.unobserve(en.target);}});}, {threshold:0.06});
   document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
 })();
+})();
 
 
 </script>
