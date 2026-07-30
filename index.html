@@ -561,21 +561,10 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// Hide loading spinner
-var gl = document.getElementById('gridLoading');
-if (gl) gl.style.display = 'none';
-
-// Track errors
-window.addEventListener('error', function(e) {
-  var rc = document.getElementById('resultsCount');
-  if (rc && rc.innerHTML.indexOf('Click to load') >= 0) {
-    rc.innerHTML = '⚠️ Script error encountered. <a href="#" onclick="location.reload();return false;">Refresh</a>';
-  }
-});
-
+document.addEventListener('DOMContentLoaded', function() {
 
 // ===== DATA =====
-const properties = [
+var properties = [
   {id:'bsp-cliff',title:'Cliff Drive Residential Lot',location:'Purok Ongasan, Brgy. Loakan',price:4095000,type:'Lot',source:'BSP',area:'',desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price.',contact:'CoronadoVM@bsp.gov.ph',contactName:'Manolito V. Coronado Jr.',phone:'(02) 5306-3422',featured:true,lat:16.411,lng:120.622},
   {id:'bpi-sunnyside',title:'Sunnyside Residential Lots (L3-L10 B8)',location:'Fairview / Sunnyside Subdivision',price:416000,type:'Lot',source:'BPI',area:'~800 sqm each',desc:'Multiple residential lots available through the Buena Mano program.',contact:'buenamano@bpi.com.ph',contactName:'BPI Buena Mano',phone:'',lat:16.395,lng:120.575},
   {id:'bpi-bermuda',title:'Bermuda Hills House and Lot',location:'Bermuda Hills Subdivision',price:12700000,type:'House',source:'BPI',area:'',desc:'Foreclosed house and lot property in Bermuda Hills.',contact:'buenamano@bpi.com.ph',contactName:'BPI Buena Mano',phone:'',lat:16.388,lng:120.565},
@@ -605,15 +594,23 @@ const properties = [
 ];
 
 // ===== HELPERS =====
-function fmt(p) { return p ? '\u20B1' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 'Price upon inquiry'; }
-const srcColors = {
+function fmtPeso(p) {
+  if (!p) return 'Price upon inquiry';
+  return '\u20B1' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+var srcColors = {
   'BSP':'#8B0000','BPI':'#004785','Pag-IBIG':'#007a4d','Security Bank':'#002d62',
   'Claire Miyabi':'#5B2D8E','MSG Realty':'#2E7D32','BDO':'#003d7a','PNB':'#1a237e',
   'EastWest':'#b8860b','Metrobank':'#b71c1c','China Bank':'#8b0000','GSIS':'#4a148c',
   'RCBC':'#d32f2f','Cari / Dotproperty':'#5d4037'
 };
-const typeIcons = { 'Lot':'\u{1F3DE}\uFE0F', 'House':'\u{1F3E0}', 'Condo':'\u{1F3E2}', 'Townhouse':'\u{1F3D8}\uFE0F', 'Various':'\u{1F4CB}' };
-const gradients = [
+var typeIcons = { 'Lot':'\u{1F3DE}\uFE0F', 'House':'\u{1F3E0}', 'Condo':'🏢', 'Townhouse':'\u{1F3D8}\uFE0F', 'Various':'📋' };
+var gradients = [
   'linear-gradient(135deg,#1e3a5f,#1e40af,#312e81)','linear-gradient(135deg,#78350f,#d97706,#92400e)',
   'linear-gradient(135deg,#064e3b,#059669,#065f46)','linear-gradient(135deg,#7f1d1d,#dc2626,#991b1b)',
   'linear-gradient(135deg,#0c4a6e,#0891b2,#0e7490)','linear-gradient(135deg,#4c1d95,#7c3aed,#6d28d9)',
@@ -622,164 +619,153 @@ const gradients = [
   'linear-gradient(135deg,#075985,#0284c7,#0369a1)','linear-gradient(135deg,#881337,#e11d48,#be123c)'
 ];
 
-let filtered = [];
-let map = null, mapMarkers = [], fullMap = null, fullMarkers = [];
+var filtered = [];
+var map = null, mapMarkers = [], fullMap = null, fullMarkers = [];
 
 // ===== FILTERS =====
 function populateFilters() {
-  try {
-    const sf = document.getElementById('filterSource');
-    const tf = document.getElementById('filterType');
-    if (!sf || !tf) return;
-    const srcs = [...new Set(properties.map(p=>p.source))].sort();
-    const typs = [...new Set(properties.map(p=>p.type))];
-    srcs.forEach(s=>{ sf.innerHTML+='<option value="'+s+'">'+s+'</option>'; });
-    typs.forEach(t=>{ tf.innerHTML+='<option value="'+t+'">'+t+'</option>'; });
-  } catch(e){}
+  var sf = document.getElementById('filterSource');
+  var tf = document.getElementById('filterType');
+  if (!sf || !tf) return;
+  var srcs = [...new Set(properties.map(function(p){return p.source;}))].sort();
+  var typs = [...new Set(properties.map(function(p){return p.type;}))];
+  srcs.forEach(function(s){ sf.innerHTML+='<option value="'+s+'">'+escHtml(s)+'</option>'; });
+  typs.forEach(function(t){ tf.innerHTML+='<option value="'+t+'">'+t+'</option>'; });
 }
 
 function apply() {
-  try {
-    const q = document.getElementById('heroSearch').value.toLowerCase().trim();
-    const src = document.getElementById('filterSource').value;
-    const typ = document.getElementById('filterType').value;
-    const min = parseInt(document.getElementById('filterMin').value);
-    const max = parseInt(document.getElementById('filterMax').value);
-    const sort = document.getElementById('sortBy').value;
-    filtered = properties.filter(function(p) {
-      if (q && p.title.toLowerCase().indexOf(q) < 0 && p.location.toLowerCase().indexOf(q) < 0 && p.source.toLowerCase().indexOf(q) < 0) return false;
-      if (src !== 'all' && p.source !== src) return false;
-      if (typ !== 'all' && p.type !== typ) return false;
-      if (p.price > 0 && (p.price < min || p.price > max)) return false;
-      return true;
-    });
-    if (sort === 'price-asc') filtered.sort(function(a,b){return (a.price||Infinity)-(b.price||Infinity);});
-    else if (sort === 'price-desc') filtered.sort(function(a,b){return (b.price||0)-(a.price||0);});
-    else if (sort === 'name') filtered.sort(function(a,b){return a.title.localeCompare(b.title);});
-    render();
-    syncMap();
-  } catch(e){}
+  var q = document.getElementById('heroSearch').value.toLowerCase().trim();
+  var src = document.getElementById('filterSource').value;
+  var typ = document.getElementById('filterType').value;
+  var min = parseInt(document.getElementById('filterMin').value) || 0;
+  var max = parseInt(document.getElementById('filterMax').value) || 999999999;
+  var sort = document.getElementById('sortBy').value;
+
+  filtered = properties.filter(function(p) {
+    if (q && p.title.toLowerCase().indexOf(q) < 0 && p.location.toLowerCase().indexOf(q) < 0 && p.source.toLowerCase().indexOf(q) < 0) return false;
+    if (src !== 'all' && p.source !== src) return false;
+    if (typ !== 'all' && p.type !== typ) return false;
+    if (p.price > 0 && (p.price < min || p.price > max)) return false;
+    return true;
+  });
+
+  if (sort === 'price-asc') filtered.sort(function(a,b){return (a.price||Infinity)-(b.price||Infinity);});
+  else if (sort === 'price-desc') filtered.sort(function(a,b){return (b.price||0)-(a.price||0);});
+  else if (sort === 'name') filtered.sort(function(a,b){return a.title.localeCompare(b.title);});
+
+  render();
+  syncMap();
 }
 
 // ===== RENDER =====
 function render() {
-  try {
-    const g = document.getElementById('propertiesGrid');
-    const r = document.getElementById('resultsCount');
-    const hc = document.getElementById('heroCount');
-    if (!g || !r) return;
+  var g = document.getElementById('propertiesGrid');
+  var r = document.getElementById('resultsCount');
+  var hc = document.getElementById('heroCount');
+  if (!g || !r) return;
 
-    if (!filtered.length) {
-      g.innerHTML = '<div class="no-results"><div class="no-results-icon">\uD83D\uDD0D</div><h3>No properties found</h3><p>Try adjusting your filters or check back later for new listings.</p></div>';
-      r.innerHTML = '0 properties found';
-      if (hc) hc.textContent = '0';
-      return;
-    }
+  if (!filtered.length) {
+    g.innerHTML = '<div class="no-results"><div class="no-results-icon">🔍</div><h3>No properties found</h3><p>Try adjusting your filters or check back later for new listings.</p></div>';
+    r.innerHTML = '0 properties found';
+    if (hc) hc.textContent = '0';
+    return;
+  }
 
-    var h = '';
-    for (var i = 0; i < filtered.length; i++) {
-      var p = filtered[i];
-      var grad = gradients[i % gradients.length];
-      var clr = srcColors[p.source] || '#555';
-      var fe = p.featured ? '<span class="card-badge">\u2B50 FEATURED</span>' : '';
-      var icon = typeIcons[p.type] || '\uD83D\uDCCB';
-      var priceDisplay = fmt(p.price);
-      var areaHtml = p.area ? '<span class="card-meta-item">\uD83D\uDCD0 '+p.area+'</span>' : '';
-      var emailTag = (p.contact && p.contact.indexOf('@') >= 0) ? '<span class="card-tag">\u2709\uFE0F '+p.contact+'</span>' : '';
-      var phoneTag = p.phone ? '<span class="card-tag">\uD83D\uDCDE '+p.phone+'</span>' : '';
+  var h = '';
+  for (var i = 0; i < filtered.length; i++) {
+    var p = filtered[i];
+    var grad = gradients[i % gradients.length];
+    var clr = srcColors[p.source] || '#555';
+    var fe = p.featured ? '<span class="card-badge">⭐ FEATURED</span>' : '';
+    var icon = typeIcons[p.type] || '📋';
+    var priceDisplay = fmtPeso(p.price);
+    var areaHtml = p.area ? '<span class="card-meta-item">📐 '+escHtml(p.area)+'</span>' : '';
+    var emailTag = (p.contact && p.contact.indexOf('@') >= 0) ? '<span class="card-tag">✉️ '+escHtml(p.contact)+'</span>' : '';
+    var phoneTag = p.phone ? '<span class="card-tag">📞 '+escHtml(p.phone)+'</span>' : '';
 
-      h += '<div class="property-card" data-id="'+p.id+'">';
-      h += '<div class="property-card-img" style="background:'+grad+';">';
-      h += '<span class="emoji-icon">'+icon+'</span>'+fe;
-      h += '<span class="card-source">'+p.source+'</span>';
-      h += '<span class="card-price-tag">'+priceDisplay+'</span>';
-      h += '<div class="card-shine"></div></div>';
-      h += '<div class="property-card-body">';
-      h += '<span class="card-type">'+p.type+'</span>';
-      h += '<h3 class="card-title">'+p.title+'</h3>';
-      h += '<p class="card-address">\uD83D\uDCCD '+p.location+'</p>';
-      h += '<div class="card-meta">'+areaHtml+'<span class="card-meta-item" style="color:'+clr+';">\uD83C\uDFF7\uFE0F '+p.source+'</span></div>';
-      h += '<div class="card-tags">'+emailTag+phoneTag+'</div>';
-      h += '<div class="card-footer"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openModal(\''+p.id+'\')">View Details</button></div>';
-      h += '</div></div>';
-    }
-    g.innerHTML = h;
-    r.innerHTML = filtered.length + ' propert' + (filtered.length !== 1 ? 'ies' : 'y') + ' found';
-    if (hc) hc.textContent = filtered.length;
+    h += '<div class="property-card" data-id="'+p.id+'">';
+    h += '<div class="property-card-img" style="background:'+grad+';">';
+    h += '<span class="emoji-icon">'+icon+'</span>'+fe;
+    h += '<span class="card-source">'+escHtml(p.source)+'</span>';
+    h += '<span class="card-price-tag">'+priceDisplay+'</span>';
+    h += '<div class="card-shine"></div></div>';
+    h += '<div class="property-card-body">';
+    h += '<span class="card-type">'+p.type+'</span>';
+    h += '<h3 class="card-title">'+escHtml(p.title)+'</h3>';
+    h += '<p class="card-address">📍 '+escHtml(p.location)+'</p>';
+    h += '<div class="card-meta">'+areaHtml+'<span class="card-meta-item" style="color:'+clr+';">🏷️ '+escHtml(p.source)+'</span></div>';
+    h += '<div class="card-tags">'+emailTag+phoneTag+'</div>';
+    h += '<div class="card-footer"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openModal(\''+p.id+'\')">View Details</button></div>';
+    h += '</div></div>';
+  }
+  g.innerHTML = h;
+  r.innerHTML = filtered.length + ' propert' + (filtered.length !== 1 ? 'ies' : 'y') + ' found';
+  if (hc) hc.textContent = filtered.length;
 
-    // Add click listeners
-    var cards = g.querySelectorAll('.property-card');
-    for (var ci = 0; ci < cards.length; ci++) {
-      (function(card) {
-        card.addEventListener('click', function() {
-          var pid = card.getAttribute('data-id');
-          for (var pi = 0; pi < properties.length; pi++) {
-            if (properties[pi].id === pid) { openModal(pid); break; }
-          }
-        });
-      })(cards[ci]);
-    }
-  } catch(e){}
+  var cards = g.querySelectorAll('.property-card');
+  for (var ci = 0; ci < cards.length; ci++) {
+    (function(card) {
+      card.addEventListener('click', function() {
+        openModal(card.getAttribute('data-id'));
+      });
+    })(cards[ci]);
+  }
 }
 
 // ===== MODAL =====
 function openModal(id) {
-  try {
-    var p = null;
-    for (var i = 0; i < properties.length; i++) { if (properties[i].id === id) { p = properties[i]; break; } }
-    if (!p) return;
-    var clr = srcColors[p.source] || '#555';
-    var priceDisplay = fmt(p.price);
-    var icon = typeIcons[p.type] || '\uD83D\uDCCB';
+  var p = null;
+  for (var i = 0; i < properties.length; i++) { if (properties[i].id === id) { p = properties[i]; break; } }
+  if (!p) return;
+  var clr = srcColors[p.source] || '#555';
+  var priceDisplay = fmtPeso(p.price);
+  var icon = typeIcons[p.type] || '📋';
 
-    var modal = document.createElement('div');
-    modal.className = 'modal-backdrop';
-    modal.id = 'propertyModal';
+  var modal = document.createElement('div');
+  modal.className = 'modal-backdrop';
+  modal.id = 'propertyModal';
 
-    var contactHtml = '';
-    if (p.contactName) contactHtml += '<div class="modal-contact-item">\uD83D\uDC64 '+p.contactName+'</div>';
-    if (p.contact && p.contact.indexOf('@') >= 0) contactHtml += '<div class="modal-contact-item">\u2709\uFE0F <a href="mailto:'+p.contact+'">'+p.contact+'</a></div>';
-    if (p.contact && p.contact.indexOf('@') < 0) contactHtml += '<div class="modal-contact-item">\uD83C\uDF10 <a href="https://'+p.contact+'" target="_blank">'+p.contact+'</a></div>';
-    if (p.phone) contactHtml += '<div class="modal-contact-item">\uD83D\uDCDE '+p.phone+'</div>';
+  var contactHtml = '';
+  if (p.contactName) contactHtml += '<div class="modal-contact-item">👤 '+escHtml(p.contactName)+'</div>';
+  if (p.contact && p.contact.indexOf('@') >= 0) contactHtml += '<div class="modal-contact-item">✉️ <a href="mailto:'+p.contact+'">'+escHtml(p.contact)+'</a></div>';
+  if (p.contact && p.contact.indexOf('@') < 0) contactHtml += '<div class="modal-contact-item">🌐 <a href="https://'+p.contact+'" target="_blank">'+escHtml(p.contact)+'</a></div>';
+  if (p.phone) contactHtml += '<div class="modal-contact-item">📞 '+escHtml(p.phone)+'</div>';
 
-    var areaStat = p.area ? '<div class="modal-stat"><span class="modal-stat-label">Area</span><strong>'+p.area+'</strong></div>' : '';
-    var emailBtn = (p.contact && p.contact.indexOf('@') >= 0) ? '<a class="btn btn-primary" href="mailto:'+p.contact+'">\u2709\uFE0F Send Inquiry</a>' : '';
+  var areaStat = p.area ? '<div class="modal-stat"><span class="modal-stat-label">Area</span><strong>'+escHtml(p.area)+'</strong></div>' : '';
+  var emailBtn = (p.contact && p.contact.indexOf('@') >= 0) ? '<a class="btn btn-primary" href="mailto:'+p.contact+'">✉️ Send Inquiry</a>' : '';
 
-    modal.innerHTML = '<div class="modal">'
-      + '<button class="modal-close" onclick="closeModal()">\u2715</button>'
-      + '<div class="modal-img" style="background:linear-gradient(135deg,'+clr+'44,'+clr+'22);">'
-      + '<span class="emoji-icon">'+icon+'</span>'
-      + '<span class="card-source" style="z-index:3;top:1rem;right:1rem;position:absolute;">'+p.source+'</span>'
-      + '</div><div class="modal-body">'
-      + '<div class="modal-header"><div>'
-      + '<span class="card-type">'+p.type+'</span>'
-      + '<h2 class="modal-title">'+p.title+'</h2>'
-      + '<p class="modal-addr">\uD83D\uDCCD '+p.location+'</p></div>'
-      + '<div class="modal-price">'+priceDisplay+'</div></div>'
-      + '<div class="modal-stats">'+areaStat
-      + '<div class="modal-stat"><span class="modal-stat-label">Source</span><strong style="color:'+clr+'">'+p.source+'</strong></div>'
-      + '<div class="modal-stat"><span class="modal-stat-label">Type</span><strong>'+p.type+'</strong></div></div>'
-      + '<div class="modal-desc"><h4>Description</h4><p>'+p.desc+'</p></div>'
-      + '<div class="modal-contact">'+contactHtml+'</div>'
-      + '<div class="modal-actions">'+emailBtn+'<button class="btn btn-outline" onclick="closeModal()">Close</button></div>'
-      + '</div></div>';
+  modal.innerHTML = '<div class="modal">'
+    + '<button class="modal-close" onclick="closeModal()">✕</button>'
+    + '<div class="modal-img" style="background:linear-gradient(135deg,'+clr+'44,'+clr+'22);">'
+    + '<span class="emoji-icon">'+icon+'</span>'
+    + '<span class="card-source" style="z-index:3;top:1rem;right:1rem;position:absolute;">'+escHtml(p.source)+'</span>'
+    + '</div><div class="modal-body">'
+    + '<div class="modal-header"><div>'
+    + '<span class="card-type">'+p.type+'</span>'
+    + '<h2 class="modal-title">'+escHtml(p.title)+'</h2>'
+    + '<p class="modal-addr">📍 '+escHtml(p.location)+'</p></div>'
+    + '<div class="modal-price">'+priceDisplay+'</div></div>'
+    + '<div class="modal-stats">'+areaStat
+    + '<div class="modal-stat"><span class="modal-stat-label">Source</span><strong style="color:'+clr+'">'+escHtml(p.source)+'</strong></div>'
+    + '<div class="modal-stat"><span class="modal-stat-label">Type</span><strong>'+p.type+'</strong></div></div>'
+    + '<div class="modal-desc"><h4>Description</h4><p>'+escHtml(p.desc)+'</p></div>'
+    + '<div class="modal-contact">'+contactHtml+'</div>'
+    + '<div class="modal-actions">'+emailBtn+'<button class="btn btn-outline" onclick="closeModal()">Close</button></div>'
+    + '</div></div>';
 
-    document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
-    setTimeout(function(){modal.classList.add('open');}, 10);
-    modal._key = function(e) { if (e.key === 'Escape') closeModal(); };
-    document.addEventListener('keydown', modal._key);
-  } catch(e){}
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+  setTimeout(function(){modal.classList.add('open');}, 10);
+  modal._key = function(e) { if (e.key === 'Escape') closeModal(); };
+  document.addEventListener('keydown', modal._key);
 }
 
 function closeModal() {
-  try {
-    var m = document.getElementById('propertyModal');
-    if (!m) return;
-    if (m._key) document.removeEventListener('keydown', m._key);
-    m.classList.remove('open');
-    setTimeout(function(){m.remove();document.body.style.overflow='';}, 300);
-  } catch(e){}
+  var m = document.getElementById('propertyModal');
+  if (!m) return;
+  if (m._key) document.removeEventListener('keydown', m._key);
+  m.classList.remove('open');
+  setTimeout(function(){m.remove();document.body.style.overflow='';}, 300);
 }
 
 function resetFilters() {
@@ -793,125 +779,116 @@ function resetFilters() {
 
 // ===== MAP VIEW =====
 function toggleView(view) {
-  try {
-    var grid = document.getElementById('propertiesGrid');
-    var mapEl = document.getElementById('propertiesMap');
-    var gb = document.getElementById('viewGrid');
-    var mb = document.getElementById('viewMap');
-    if (!grid || !mapEl || !gb || !mb) return;
-    if (view === 'map') {
-      grid.style.display = 'none';
-      mapEl.style.display = 'block';
-      gb.classList.remove('active');
-      mb.classList.add('active');
-      if (!map && typeof L !== 'undefined') initMap();
-      else if (map) map.invalidateSize();
-    } else {
-      grid.style.display = '';
-      mapEl.style.display = 'none';
-      gb.classList.add('active');
-      mb.classList.remove('active');
-    }
-  } catch(e){}
+  var grid = document.getElementById('propertiesGrid');
+  var mapEl = document.getElementById('propertiesMap');
+  var gb = document.getElementById('viewGrid');
+  var mb = document.getElementById('viewMap');
+  if (!grid || !mapEl || !gb || !mb) return;
+  if (view === 'map') {
+    grid.style.display = 'none';
+    mapEl.style.display = 'block';
+    gb.classList.remove('active');
+    mb.classList.add('active');
+    if (!map && typeof L !== 'undefined') initMap();
+    else if (map) map.invalidateSize();
+  } else {
+    grid.style.display = '';
+    mapEl.style.display = 'none';
+    gb.classList.add('active');
+    mb.classList.remove('active');
+  }
 }
 
 function initMap() {
-  try {
-    if (typeof L === 'undefined') return;
-    map = L.map('propertiesMap', { zoomControl: true }).setView([16.402, 120.585], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>'
-    }).addTo(map);
-    syncMap();
-  } catch(e){}
+  if (typeof L === 'undefined') return;
+  map = L.map('propertiesMap', { zoomControl: true }).setView([16.402, 120.585], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>'
+  }).addTo(map);
+  syncMap();
 }
 
 function syncMap() {
-  try {
-    if (!map || typeof L === 'undefined') return;
-    mapMarkers.forEach(function(m){map.removeLayer(m);});
-    mapMarkers = [];
-    var ids = {};
-    for (var i = 0; i < filtered.length; i++) ids[filtered[i].id] = true;
-    var shown = [];
-    for (var i = 0; i < properties.length; i++) {
-      if (ids[properties[i].id] && properties[i].lat && properties[i].lng) shown.push(properties[i]);
-    }
-    if (!shown.length) return;
-    for (var si = 0; si < shown.length; si++) {
-      var p = shown[si];
-      var clr = srcColors[p.source] || '#555';
-      var m = L.marker([p.lat, p.lng], {
-        icon: L.divIcon({
-          html: '<div class="map-pin" style="background:'+clr+'">'+fmt(p.price).substring(0,14)+'</div>',
-          className: '', iconSize: [0, 0], iconAnchor: [40, 14]
-        })
-      }).addTo(map);
-      m.bindPopup('<div class="map-popup">'
-        + '<strong class="map-popup-title">'+p.title+'</strong>'
-        + '<p class="map-popup-addr">\uD83D\uDCCD '+p.location+'</p>'
-        + '<p class="map-popup-price" style="color:'+clr+'">'+fmt(p.price)+'</p>'
-        + '<p class="map-popup-meta">'+(p.area ? '\uD83D\uDCD0 '+p.area : '')+' &nbsp; \uD83C\uDFF7\uFE0F '+p.source+'</p>'
-        + '<button class="map-popup-btn" style="background:'+clr+'" onclick="openModal(\''+p.id+'\')">View Details</button>'
-        + '</div>');
-      mapMarkers.push(m);
-    }
-    if (shown.length === 1) map.setView([shown[0].lat, shown[0].lng], 14);
-    else {
-      try {
-        var g = L.featureGroup(mapMarkers);
-        map.fitBounds(g.getBounds().pad(0.15));
-      } catch(e){}
-    }
-  } catch(e){}
+  if (!map || typeof L === 'undefined') return;
+  mapMarkers.forEach(function(m){map.removeLayer(m);});
+  mapMarkers = [];
+  var ids = {};
+  for (var i = 0; i < filtered.length; i++) ids[filtered[i].id] = true;
+  var shown = [];
+  for (var i = 0; i < properties.length; i++) {
+    if (ids[properties[i].id] && properties[i].lat && properties[i].lng) shown.push(properties[i]);
+  }
+  if (!shown.length) return;
+  for (var si = 0; si < shown.length; si++) {
+    var p = shown[si];
+    var clr = srcColors[p.source] || '#555';
+    var m = L.marker([p.lat, p.lng], {
+      icon: L.divIcon({
+        html: '<div class="map-pin" style="background:'+clr+'">'+fmtPeso(p.price).substring(0,14)+'</div>',
+        className: '', iconSize: [0, 0], iconAnchor: [40, 14]
+      })
+    }).addTo(map);
+    m.bindPopup('<div class="map-popup">'
+      + '<strong class="map-popup-title">'+escHtml(p.title)+'</strong>'
+      + '<p class="map-popup-addr">📍 '+escHtml(p.location)+'</p>'
+      + '<p class="map-popup-price" style="color:'+clr+'">'+fmtPeso(p.price)+'</p>'
+      + '<p class="map-popup-meta">'+(p.area ? '📐 '+escHtml(p.area) : '')+' &nbsp; 🏷️ '+escHtml(p.source)+'</p>'
+      + '<button class="map-popup-btn" style="background:'+clr+'" onclick="openModal(\''+p.id+'\')">View Details</button>'
+      + '</div>');
+    mapMarkers.push(m);
+  }
+  if (shown.length === 1) map.setView([shown[0].lat, shown[0].lng], 14);
+  else {
+    try { map.fitBounds(L.featureGroup(mapMarkers).getBounds().pad(0.15)); } catch(e){}
+  }
 }
 
 function initFullMap() {
-  try {
-    if (typeof L === 'undefined') return;
-    fullMap = L.map('fullMap', { zoomControl: true }).setView([16.402, 120.585], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>'
+  if (typeof L === 'undefined') return;
+  fullMap = L.map('fullMap', { zoomControl: true }).setView([16.402, 120.585], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>'
+  }).addTo(fullMap);
+  for (var i = 0; i < properties.length; i++) {
+    var p = properties[i];
+    if (!p.lat || !p.lng) continue;
+    var clr = srcColors[p.source] || '#555';
+    var m = L.marker([p.lat, p.lng], {
+      icon: L.divIcon({
+        html: '<div class="map-pin" style="background:'+clr+'">'+escHtml(p.source)+'</div>',
+        className: '', iconSize: [0, 0], iconAnchor: [28, 14]
+      })
     }).addTo(fullMap);
-    for (var i = 0; i < properties.length; i++) {
-      var p = properties[i];
-      if (!p.lat || !p.lng) continue;
-      var clr = srcColors[p.source] || '#555';
-      var m = L.marker([p.lat, p.lng], {
-        icon: L.divIcon({
-          html: '<div class="map-pin" style="background:'+clr+'">'+p.source+'</div>',
-          className: '', iconSize: [0, 0], iconAnchor: [28, 14]
-        })
-      }).addTo(fullMap);
-      m.bindPopup('<div class="map-popup"><strong class="map-popup-title">'+p.title+'</strong><p class="map-popup-addr">\uD83D\uDCCD '+p.location+'</p><p class="map-popup-price" style="color:'+clr+'">'+fmt(p.price)+'</p><button class="map-popup-btn" style="background:'+clr+'" onclick="openModal(\''+p.id+'\')">View Details</button></div>');
-      fullMarkers.push(m);
-    }
-  } catch(e){}
+    m.bindPopup('<div class="map-popup"><strong class="map-popup-title">'+escHtml(p.title)+'</strong><p class="map-popup-addr">📍 '+escHtml(p.location)+'</p><p class="map-popup-price" style="color:'+clr+'">'+fmtPeso(p.price)+'</p><button class="map-popup-btn" style="background:'+clr+'" onclick="openModal(\''+p.id+'\')">View Details</button></div>');
+    fullMarkers.push(m);
+  }
 }
 
 // ===== CONTACT FORM =====
 function submitInquiry(e) {
   e.preventDefault();
-  try {
-    var name = document.getElementById('inqName').value.trim();
-    var email = document.getElementById('inqEmail').value.trim();
-    var phone = document.getElementById('inqPhone').value.trim();
-    var type = document.getElementById('inqType').value;
-    var msg = document.getElementById('inqMessage').value.trim();
-    var subject = encodeURIComponent('Inquiry from ' + name + ' - Palico Realty');
-    var body = 'Name: ' + name + '\\nEmail: ' + email;
-    if (phone) body += '\\nPhone: ' + phone;
-    if (type) body += '\\nInterest: ' + type;
-    body += '\\n\\nMessage:\\n' + msg;
-    body += '\\n\\n---\\nSent from Palico Realty - Baguio Foreclosures';
-    window.location.href = 'mailto:tipopalilio@gmail.com?subject=' + subject + '&body=' + encodeURIComponent(body);
-    var t = document.getElementById('formToast');
-    if (t) { t.textContent = '\uD83D\uDCE7 Opening your email client...'; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');}, 4000); }
-  } catch(e){}
+  var name = document.getElementById('inqName').value.trim();
+  var email = document.getElementById('inqEmail').value.trim();
+  var phone = document.getElementById('inqPhone').value.trim();
+  var type = document.getElementById('inqType').value;
+  var msg = document.getElementById('inqMessage').value.trim();
+  var subject = encodeURIComponent('Inquiry from ' + name + ' - Palico Realty');
+  var body = 'Name: ' + name + '\nEmail: ' + email;
+  if (phone) body += '\nPhone: ' + phone;
+  if (type) body += '\nInterest: ' + type;
+  body += '\n\nMessage:\n' + msg;
+  body += '\n\n---\nSent from Palico Realty - Baguio Foreclosures';
+  window.location.href = 'mailto:tipopalilio@gmail.com?subject=' + subject + '&body=' + encodeURIComponent(body);
+  var t = document.getElementById('formToast');
+  if (t) { t.textContent = '📧 Opening your email client...'; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');}, 4000); }
 }
 
 // ===== INIT =====
-try {
+(function init() {
+  // Hide loading spinner
+  var gl = document.getElementById('gridLoading');
+  if (gl) gl.style.display = 'none';
+
   populateFilters();
   apply();
   document.getElementById('heroSources').textContent = [...new Set(properties.map(function(p){return p.source;}))].length;
@@ -919,7 +896,11 @@ try {
 
   // Nav scroll
   var nav = document.getElementById('nav');
-  if (nav) window.addEventListener('scroll', function(){nav.classList.toggle('scrolled', window.scrollY > 60);});
+  if (nav) {
+    window.addEventListener('scroll', function(){
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+  }
 
   // Particles
   var pc = document.getElementById('particles');
@@ -934,12 +915,9 @@ try {
   // Reveal observer
   var ro = new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting){en.target.classList.add('visible');ro.unobserve(en.target);}});}, {threshold:0.06});
   document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
+})();
 
-} catch(e) {
-  // Fallback: show message if JS fails
-  var rc = document.getElementById('resultsCount');
-  if (rc) rc.innerHTML = 'Unable to load properties. Please refresh the page.';
-}
+});
 </script>
 <noscript><div style="position:fixed;bottom:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:.75rem;z-index:9999;font-size:.9rem;">⚠️ Please enable JavaScript to view property listings.</div></noscript></body>
 </html>
