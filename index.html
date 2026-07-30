@@ -66,7 +66,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 .reveal.d4 { transition-delay: .4s; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
-.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 0; transition: var(--transition); }
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 0; transition: var(--transition); background: linear-gradient(180deg, rgba(15,23,42,.5) 0%, transparent 100%); }
 .nav.scrolled { background: rgba(255,255,255,.97); backdrop-filter: blur(12px); padding: .85rem 0; box-shadow: 0 2px 20px rgba(0,0,0,.08); }
 .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; gap: 2rem; }
 .nav-logo { display: flex; align-items: center; gap: .6rem; font-size: 1.15rem; color: #fff; font-family: 'Inter'; white-space: nowrap; flex-shrink: 0; font-weight: 600; }
@@ -250,6 +250,10 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
   .hero-stats { gap: 1.5rem; }
   .stat-sep { display: none; }
 }
+
+.grid-loading { grid-column: 1 / -1; text-align: center; padding: 4rem 0; }
+.loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -557,6 +561,19 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// Hide loading spinner
+var gl = document.getElementById('gridLoading');
+if (gl) gl.style.display = 'none';
+
+// Track errors
+window.addEventListener('error', function(e) {
+  var rc = document.getElementById('resultsCount');
+  if (rc && rc.innerHTML.indexOf('Click to load') >= 0) {
+    rc.innerHTML = '⚠️ Script error encountered. <a href="#" onclick="location.reload();return false;">Refresh</a>';
+  }
+});
+
+
 // ===== DATA =====
 const properties = [
   {id:'bsp-cliff',title:'Cliff Drive Residential Lot',location:'Purok Ongasan, Brgy. Loakan',price:4095000,type:'Lot',source:'BSP',area:'',desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price.',contact:'CoronadoVM@bsp.gov.ph',contactName:'Manolito V. Coronado Jr.',phone:'(02) 5306-3422',featured:true,lat:16.411,lng:120.622},
@@ -924,5 +941,5 @@ try {
   if (rc) rc.innerHTML = 'Unable to load properties. Please refresh the page.';
 }
 </script>
-</body>
+<noscript><div style="position:fixed;bottom:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:.75rem;z-index:9999;font-size:.9rem;">⚠️ Please enable JavaScript to view property listings.</div></noscript></body>
 </html>
