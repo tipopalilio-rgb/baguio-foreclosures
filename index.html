@@ -563,8 +563,6 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-(function() {
-
 // ===== DATA =====
 var properties = [
   {id:'bsp-cliff',title:'Cliff Drive Residential Lot',location:'Purok Ongasan, Brgy. Loakan',price:4095000,type:'Lot',source:'BSP',area:'',desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price.',contact:'CoronadoVM@bsp.gov.ph',contactName:'Manolito V. Coronado Jr.',phone:'(02) 5306-3422',featured:true,lat:16.411,lng:120.622},
@@ -918,7 +916,7 @@ function submitInquiry(e) {
   var ro = new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting){en.target.classList.add('visible');ro.unobserve(en.target);}});}, {threshold:0.06});
   document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
 })();
-})();
+
 
 
 </script>
