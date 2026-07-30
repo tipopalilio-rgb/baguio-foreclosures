@@ -557,47 +557,45 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// ===== DATA =====
 const properties = [
-  { id:'bsp-cliff', title:'Cliff Drive Residential Lot', location:'Purok Ongasan, Brgy. Loakan', price:4095000, type:'Lot', source:'BSP', area:'', desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price. For inquiries, contact Manolito V. Coronado Jr.', contact:'CoronadoVM@bsp.gov.ph', contactName:'Manolito V. Coronado Jr.', phone:'(02) 5306-3422', featured:true, lat:16.411, lng:120.622 },
-  { id:'bpi-sunnyside', title:'Sunnyside Residential Lots (L3-L10 B8)', location:'Fairview / Sunnyside Subdivision', price:416000, type:'Lot', source:'BPI', area:'~800 sqm each', desc:'Multiple residential lots available through the Buena Mano program. Sold as-is, where-is.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.395, lng:120.575 },
-  { id:'bpi-bermuda', title:'Bermuda Hills House & Lot', location:'Bermuda Hills Subdivision', price:12700000, type:'House', source:'BPI', area:'', desc:'Foreclosed house and lot property in Bermuda Hills. High equity required.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.388, lng:120.565 },
-  { id:'bpi-megatower', title:'Megatower Residences Condominium', location:'Near SM City Baguio', price:0, type:'Condo', source:'BPI', area:'', desc:'Prime location condominium unit near SM City Baguio. Price upon inquiry.', contact:'buenamano@bpi.com.ph', contactName:'BPI Buena Mano', phone:'', lat:16.401, lng:120.598 },
-  { id:'security-bank', title:'Bakakeng Central Lot - Crystal Cave', location:'Crystal Cave, Bakakeng Central', price:28171000, type:'Lot', source:'Security Bank', area:'2,667 sqm', desc:'Large residential lot in Bakakeng Central area.', contact:'NPinson@securitybank.com', contactName:'N. Pinson', phone:'', lat:16.418, lng:120.602 },
-  { id:'miyabi', title:'Ferguson Road House & Lot', location:'Ferguson Road / Andres Bonifacio', price:16000000, type:'House', source:'Claire Miyabi', area:'240 sqm lot', desc:'House and lot in prime Baguio location.', contact:'admin@miyabirealty.com', contactName:'Claire Miyabi', phone:'+63 9505870775', lat:16.409, lng:120.608 },
-  { id:'msg', title:'San Luis Village Lot - Asin Road', location:'Asin Road', price:10125000, type:'Lot', source:'MSG Realty', area:'15,000 sqm', desc:'Expansive lot in San Luis Village. Ref: MSG-44-0620.', contact:'info@msg-homes.com', contactName:'MSG Realty', phone:'', lat:16.382, lng:120.55 },
-  { id:'bdo', title:'Ciudad Grande Condominium Unit', location:'Bakakeng North', price:1650000, type:'Condo', source:'BDO', area:'15 sqm', desc:'Condominium unit in Ciudad Grande Subdivision.', contact:'retailsales@bdo.com.ph', contactName:'BDO Assets', phone:'', lat:16.42, lng:120.605 },
-  { id:'pnb', title:'Balacbac Road Residential Lot', location:'Brgy. Balacbac', price:0, type:'Lot', source:'PNB', area:'996 sqm', desc:'Residential lot along Balacbac Road. Price upon inquiry.', contact:'tubiganeb@pnb.com.ph', contactName:'PNB CAR Region', phone:'', lat:16.43, lng:120.59 },
-  { id:'pagibig-st', title:'Santo Tomas Lot - C.C.O.D.A.', location:'C.C.O.D.A. Subdivision', price:1215000, type:'Lot', source:'Pag-IBIG', area:'', desc:'Negotiated sale residential lot in Santo Tomas Proper.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.365, lng:120.56 },
-  { id:'pagibig-w', title:'North Cambridge Wharton Condo', location:'Unit 3F-20, Bakakeng Norte', price:2365200, type:'Condo', source:'Pag-IBIG', area:'', desc:'Condominium unit in North Cambridge Wharton.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.416, lng:120.6 },
-  { id:'pagibig-c', title:'3rd The Court Condominium - Ambiong', location:'CY-M2-B3-3BF-002, Ambiong', price:5250000, type:'Condo', source:'Pag-IBIG', area:'', desc:'Condominium unit at 3rd The Court, Ambiong.', contact:'pagibigfundservices.com', contactName:'Pag-IBIG Fund', phone:'', lat:16.404, lng:120.582 },
-  { id:'pagibig-p', title:'North Cambridge Princeton Condo Units', location:'Bakakeng Norte', price:1756875, type:'Condo', source:'Pag-IBIG', area:'', desc:'Available units in North Cambridge Princeton.', contact:'acquiredassets.ph', contactName:'Pag-IBIG Fund', phone:'', lat:16.417, lng:120.601 },
-  { id:'ew', title:'EastWest EasySale Properties', location:'Various, Baguio City', price:0, type:'Various', source:'EastWest', area:'', desc:'Various foreclosed properties under the EasySale Program. Partner with us for broker accreditation.', contact:'reproperties@eastwestbanker.com', contactName:'EastWest Bank', phone:'0999 8857830', lat:16.412, lng:120.595 },
-  { id:'metro', title:'Aurora Hill Residential Lot', location:'Aurora Hill', price:0, type:'Lot', source:'Metrobank', area:'', desc:'Foreclosed residential lot in Aurora Hill.', contact:'goldamier.galorio@metrobank.com.ph', contactName:'Metrobank AAMDD', phone:'(02) 8830-6204', lat:16.407, lng:120.59 },
-  { id:'china', title:'China Bank Acquired Assets', location:'Baguio City & Benguet', price:0, type:'Various', source:'China Bank', area:'', desc:'China Bank acquired assets for sale.', contact:'chinabank.ph/acquired-assets-for-sale', contactName:'China Bank', phone:'', lat:16.403, lng:120.587 },
-  { id:'gsis', title:'GSIS LWOB Properties (17 units)', location:'Various, Baguio City', price:0, type:'Various', source:'GSIS', area:'', desc:'17 properties under the Lease with Option to Buy program.', contact:'gsisrpamdcst@gsis.gov.ph', contactName:'GSIS RPAMD', phone:'', lat:16.41, lng:120.592 },
-  { id:'rcbc', title:'RCBC Disposed Properties', location:'Various, Baguio City', price:0, type:'Various', source:'RCBC', area:'', desc:'Foreclosed properties sold through public auctions. 3% commission for referrals.', contact:'mdcadiao@rcbc.com', contactName:'RCBC ROPA Sales (Median Cadiao)', phone:'0918-9929605', lat:16.406, lng:120.596 },
-  { id:'cari1', title:'SLU-SVP Housing Village (25BR)', location:'SLU-SVP Housing Village', price:19215000, type:'House', source:'Cari / Dotproperty', area:'25BR', desc:'Large house in SLU-SVP Housing Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.38, lng:120.57 },
-  { id:'cari2', title:'Dominican Hill-Mirador House', location:'Dominican Hill-Mirador', price:7170000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Dominican Hill-Mirador area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.396, lng:120.589 },
-  { id:'cari3', title:'Pacdal / Brentwood Townhouse (4BR)', location:'Pacdal / Brentwood Village', price:5959700, type:'Townhouse', source:'Cari / Dotproperty', area:'4BR', desc:'Townhouse in Pacdal / Brentwood Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.399, lng:120.578 },
-  { id:'cari4', title:'Irisan House', location:'Irisan', price:8340000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Irisan area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.36, lng:120.53 },
-  { id:'cari5', title:'Camp 7 House (4BR)', location:'Camp 7', price:5590000, type:'House', source:'Cari / Dotproperty', area:'4BR', desc:'House in Camp 7 area.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.375, lng:120.58 },
-  { id:'cari6', title:'Lexberville House - Sto. Tomas', location:'Lexberville, Sto. Tomas', price:8800000, type:'House', source:'Cari / Dotproperty', area:'', desc:'House in Lexberville, Sto. Tomas.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.358, lng:120.555 },
-  { id:'cari7', title:'Middle Quezon Hill House (5BR)', location:'Middle Quezon Hill', price:6070000, type:'House', source:'Cari / Dotproperty', area:'5BR', desc:'House in Middle Quezon Hill.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.385, lng:120.562 },
-  { id:'cari8', title:'San Luis Village Lot w/ Improvement', location:'San Luis Village', price:4410000, type:'Lot', source:'Cari / Dotproperty', area:'Improvement', desc:'Lot with improvement in San Luis Village.', contact:'', contactName:'Cari / Dotproperty', phone:'', lat:16.383, lng:120.548 }
+  {id:'bsp-cliff',title:'Cliff Drive Residential Lot',location:'Purok Ongasan, Brgy. Loakan',price:4095000,type:'Lot',source:'BSP',area:'',desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price.',contact:'CoronadoVM@bsp.gov.ph',contactName:'Manolito V. Coronado Jr.',phone:'(02) 5306-3422',featured:true,lat:16.411,lng:120.622},
+  {id:'bpi-sunnyside',title:'Sunnyside Residential Lots (L3-L10 B8)',location:'Fairview / Sunnyside Subdivision',price:416000,type:'Lot',source:'BPI',area:'~800 sqm each',desc:'Multiple residential lots available through the Buena Mano program.',contact:'buenamano@bpi.com.ph',contactName:'BPI Buena Mano',phone:'',lat:16.395,lng:120.575},
+  {id:'bpi-bermuda',title:'Bermuda Hills House and Lot',location:'Bermuda Hills Subdivision',price:12700000,type:'House',source:'BPI',area:'',desc:'Foreclosed house and lot property in Bermuda Hills.',contact:'buenamano@bpi.com.ph',contactName:'BPI Buena Mano',phone:'',lat:16.388,lng:120.565},
+  {id:'bpi-megatower',title:'Megatower Residences Condominium',location:'Near SM City Baguio',price:0,type:'Condo',source:'BPI',area:'',desc:'Prime location condominium unit near SM City Baguio. Price upon inquiry.',contact:'buenamano@bpi.com.ph',contactName:'BPI Buena Mano',phone:'',lat:16.401,lng:120.598},
+  {id:'security-bank',title:'Bakakeng Central Lot - Crystal Cave',location:'Crystal Cave, Bakakeng Central',price:28171000,type:'Lot',source:'Security Bank',area:'2,667 sqm',desc:'Large residential lot in Bakakeng Central area.',contact:'NPinson@securitybank.com',contactName:'N. Pinson',phone:'',lat:16.418,lng:120.602},
+  {id:'miyabi',title:'Ferguson Road House and Lot',location:'Ferguson Road / Andres Bonifacio',price:16000000,type:'House',source:'Claire Miyabi',area:'240 sqm lot',desc:'House and lot in prime Baguio location.',contact:'admin@miyabirealty.com',contactName:'Claire Miyabi',phone:'+63 9505870775',lat:16.409,lng:120.608},
+  {id:'msg',title:'San Luis Village Lot - Asin Road',location:'Asin Road',price:10125000,type:'Lot',source:'MSG Realty',area:'15,000 sqm',desc:'Expansive lot in San Luis Village.',contact:'info@msg-homes.com',contactName:'MSG Realty',phone:'',lat:16.382,lng:120.55},
+  {id:'bdo',title:'Ciudad Grande Condominium Unit',location:'Bakakeng North',price:1650000,type:'Condo',source:'BDO',area:'15 sqm',desc:'Condominium unit in Ciudad Grande Subdivision.',contact:'retailsales@bdo.com.ph',contactName:'BDO Assets',phone:'',lat:16.42,lng:120.605},
+  {id:'pnb',title:'Balacbac Road Residential Lot',location:'Brgy. Balacbac',price:0,type:'Lot',source:'PNB',area:'996 sqm',desc:'Residential lot along Balacbac Road. Price upon inquiry.',contact:'tubiganeb@pnb.com.ph',contactName:'PNB CAR Region',phone:'',lat:16.43,lng:120.59},
+  {id:'pagibig-st',title:'Santo Tomas Lot - C.C.O.D.A.',location:'C.C.O.D.A. Subdivision',price:1215000,type:'Lot',source:'Pag-IBIG',area:'',desc:'Negotiated sale residential lot in Santo Tomas Proper.',contact:'pagibigfundservices.com',contactName:'Pag-IBIG Fund',phone:'',lat:16.365,lng:120.56},
+  {id:'pagibig-w',title:'North Cambridge Wharton Condo',location:'Unit 3F-20, Bakakeng Norte',price:2365200,type:'Condo',source:'Pag-IBIG',area:'',desc:'Condominium unit in North Cambridge Wharton.',contact:'pagibigfundservices.com',contactName:'Pag-IBIG Fund',phone:'',lat:16.416,lng:120.6},
+  {id:'pagibig-c',title:'3rd The Court Condominium - Ambiong',location:'CY-M2-B3-3BF-002, Ambiong',price:5250000,type:'Condo',source:'Pag-IBIG',area:'',desc:'Condominium unit at 3rd The Court, Ambiong.',contact:'pagibigfundservices.com',contactName:'Pag-IBIG Fund',phone:'',lat:16.404,lng:120.582},
+  {id:'pagibig-p',title:'North Cambridge Princeton Condo Units',location:'Bakakeng Norte',price:1756875,type:'Condo',source:'Pag-IBIG',area:'',desc:'Available units in North Cambridge Princeton.',contact:'acquiredassets.ph',contactName:'Pag-IBIG Fund',phone:'',lat:16.417,lng:120.601},
+  {id:'ew',title:'EastWest EasySale Properties',location:'Various, Baguio City',price:0,type:'Various',source:'EastWest',area:'',desc:'Various foreclosed properties under the EasySale Program.',contact:'reproperties@eastwestbanker.com',contactName:'EastWest Bank',phone:'0999 8857830',lat:16.412,lng:120.595},
+  {id:'metro',title:'Aurora Hill Residential Lot',location:'Aurora Hill',price:0,type:'Lot',source:'Metrobank',area:'',desc:'Foreclosed residential lot in Aurora Hill.',contact:'goldamier.galorio@metrobank.com.ph',contactName:'Metrobank AAMDD',phone:'(02) 8830-6204',lat:16.407,lng:120.59},
+  {id:'china',title:'China Bank Acquired Assets',location:'Baguio City and Benguet',price:0,type:'Various',source:'China Bank',area:'',desc:'China Bank acquired assets for sale.',contact:'chinabank.ph/acquired-assets-for-sale',contactName:'China Bank',phone:'',lat:16.403,lng:120.587},
+  {id:'gsis',title:'GSIS LWOB Properties (17 units)',location:'Various, Baguio City',price:0,type:'Various',source:'GSIS',area:'',desc:'17 properties under the Lease with Option to Buy program.',contact:'gsisrpamdcst@gsis.gov.ph',contactName:'GSIS RPAMD',phone:'',lat:16.41,lng:120.592},
+  {id:'rcbc',title:'RCBC Disposed Properties',location:'Various, Baguio City',price:0,type:'Various',source:'RCBC',area:'',desc:'Foreclosed properties. 3% commission for referrals.',contact:'mdcadiao@rcbc.com',contactName:'RCBC ROPA Sales',phone:'0918-9929605',lat:16.406,lng:120.596},
+  {id:'cari1',title:'SLU-SVP Housing Village (25BR)',location:'SLU-SVP Housing Village',price:19215000,type:'House',source:'Cari / Dotproperty',area:'25BR',desc:'Large house in SLU-SVP Housing Village.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.38,lng:120.57},
+  {id:'cari2',title:'Dominican Hill-Mirador House',location:'Dominican Hill-Mirador',price:7170000,type:'House',source:'Cari / Dotproperty',area:'',desc:'House in Dominican Hill-Mirador area.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.396,lng:120.589},
+  {id:'cari3',title:'Pacdal / Brentwood Townhouse (4BR)',location:'Pacdal / Brentwood Village',price:5959700,type:'Townhouse',source:'Cari / Dotproperty',area:'4BR',desc:'Townhouse in Pacdal / Brentwood Village.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.399,lng:120.578},
+  {id:'cari4',title:'Irisan House',location:'Irisan',price:8340000,type:'House',source:'Cari / Dotproperty',area:'',desc:'House in Irisan area.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.36,lng:120.53},
+  {id:'cari5',title:'Camp 7 House (4BR)',location:'Camp 7',price:5590000,type:'House',source:'Cari / Dotproperty',area:'4BR',desc:'House in Camp 7 area.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.375,lng:120.58},
+  {id:'cari6',title:'Lexberville House - Sto. Tomas',location:'Lexberville, Sto. Tomas',price:8800000,type:'House',source:'Cari / Dotproperty',area:'',desc:'House in Lexberville, Sto. Tomas.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.358,lng:120.555},
+  {id:'cari7',title:'Middle Quezon Hill House (5BR)',location:'Middle Quezon Hill',price:6070000,type:'House',source:'Cari / Dotproperty',area:'5BR',desc:'House in Middle Quezon Hill.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.385,lng:120.562},
+  {id:'cari8',title:'San Luis Village Lot w/ Improvement',location:'San Luis Village',price:4410000,type:'Lot',source:'Cari / Dotproperty',area:'Improvement',desc:'Lot with improvement in San Luis Village.',contact:'',contactName:'Cari / Dotproperty',phone:'',lat:16.383,lng:120.548}
 ];
 
-let filtered = [];
-let map = null, mapMarkers = [], fullMap = null, fullMarkers = [];
-function fmt(p)
-function fmt(p) { return p ? '₱' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 'Price upon inquiry'; }
-
+// ===== HELPERS =====
+function fmt(p) { return p ? '\u20B1' + p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 'Price upon inquiry'; }
 const srcColors = {
   'BSP':'#8B0000','BPI':'#004785','Pag-IBIG':'#007a4d','Security Bank':'#002d62',
   'Claire Miyabi':'#5B2D8E','MSG Realty':'#2E7D32','BDO':'#003d7a','PNB':'#1a237e',
   'EastWest':'#b8860b','Metrobank':'#b71c1c','China Bank':'#8b0000','GSIS':'#4a148c',
   'RCBC':'#d32f2f','Cari / Dotproperty':'#5d4037'
 };
-const typeIcons = { 'Lot':'🏞️', 'House':'🏠', 'Condo':'🏢', 'Townhouse':'🏘️', 'Various':'📋' };
+const typeIcons = { 'Lot':'\u{1F3DE}\uFE0F', 'House':'\u{1F3E0}', 'Condo':'\u{1F3E2}', 'Townhouse':'\u{1F3D8}\uFE0F', 'Various':'\u{1F4CB}' };
 const gradients = [
   'linear-gradient(135deg,#1e3a5f,#1e40af,#312e81)','linear-gradient(135deg,#78350f,#d97706,#92400e)',
   'linear-gradient(135deg,#064e3b,#059669,#065f46)','linear-gradient(135deg,#7f1d1d,#dc2626,#991b1b)',
@@ -610,141 +608,161 @@ const gradients = [
 let filtered = [];
 let map = null, mapMarkers = [], fullMap = null, fullMarkers = [];
 
+// ===== FILTERS =====
 function populateFilters() {
-  const sf = document.getElementById('filterSource');
-  const tf = document.getElementById('filterType');
-  const srcs = [...new Set(properties.map(p=>p.source))].sort();
-  const typs = [...new Set(properties.map(p=>p.type))];
-  srcs.forEach(s=>{ sf.innerHTML+=`<option value="${s}">${s}</option>` });
-  typs.forEach(t=>{ tf.innerHTML+=`<option value="${t}">${t}</option>` });
+  try {
+    const sf = document.getElementById('filterSource');
+    const tf = document.getElementById('filterType');
+    if (!sf || !tf) return;
+    const srcs = [...new Set(properties.map(p=>p.source))].sort();
+    const typs = [...new Set(properties.map(p=>p.type))];
+    srcs.forEach(s=>{ sf.innerHTML+='<option value="'+s+'">'+s+'</option>'; });
+    typs.forEach(t=>{ tf.innerHTML+='<option value="'+t+'">'+t+'</option>'; });
+  } catch(e){}
 }
 
 function apply() {
-  const q = document.getElementById('heroSearch').value.toLowerCase().trim();
-  const src = document.getElementById('filterSource').value;
-  const typ = document.getElementById('filterType').value;
-  const min = parseInt(document.getElementById('filterMin').value);
-  const max = parseInt(document.getElementById('filterMax').value);
-  const sort = document.getElementById('sortBy').value;
-  filtered = properties.filter(p => {
-    if (q && !p.title.toLowerCase().includes(q) && !p.location.toLowerCase().includes(q) && !p.source.toLowerCase().includes(q)) return false;
-    if (src !== 'all' && p.source !== src) return false;
-    if (typ !== 'all' && p.type !== typ) return false;
-    if (p.price > 0 && (p.price < min || p.price > max)) return false;
-    return true;
-  });
-  if (sort === 'price-asc') filtered.sort((a,b)=>(a.price||Infinity)-(b.price||Infinity));
-  else if (sort === 'price-desc') filtered.sort((a,b)=>(b.price||0)-(a.price||0));
-  else if (sort === 'name') filtered.sort((a,b)=>a.title.localeCompare(b.title));
-  render();
-  syncMap();
+  try {
+    const q = document.getElementById('heroSearch').value.toLowerCase().trim();
+    const src = document.getElementById('filterSource').value;
+    const typ = document.getElementById('filterType').value;
+    const min = parseInt(document.getElementById('filterMin').value);
+    const max = parseInt(document.getElementById('filterMax').value);
+    const sort = document.getElementById('sortBy').value;
+    filtered = properties.filter(function(p) {
+      if (q && p.title.toLowerCase().indexOf(q) < 0 && p.location.toLowerCase().indexOf(q) < 0 && p.source.toLowerCase().indexOf(q) < 0) return false;
+      if (src !== 'all' && p.source !== src) return false;
+      if (typ !== 'all' && p.type !== typ) return false;
+      if (p.price > 0 && (p.price < min || p.price > max)) return false;
+      return true;
+    });
+    if (sort === 'price-asc') filtered.sort(function(a,b){return (a.price||Infinity)-(b.price||Infinity);});
+    else if (sort === 'price-desc') filtered.sort(function(a,b){return (b.price||0)-(a.price||0);});
+    else if (sort === 'name') filtered.sort(function(a,b){return a.title.localeCompare(b.title);});
+    render();
+    syncMap();
+  } catch(e){}
 }
 
+// ===== RENDER =====
 function render() {
-  const g = document.getElementById('propertiesGrid');
-  const r = document.getElementById('resultsCount');
-  if (!filtered.length) {
-    g.innerHTML = '<div class="no-results"><div class="no-results-icon">🔍</div><h3>No properties found</h3><p>Try adjusting your filters.</p></div>';
-    r.innerHTML = '0 properties found';
-    document.getElementById('heroCount').textContent = '0';
-    return;
-  }
-  let h = '';
-  filtered.forEach((p,i)=>{
-    const grad = gradients[i % gradients.length];
-    const clr = srcColors[p.source] || '#555';
-    const fe = p.featured ? '<span class="card-badge">⭐ FEATURED</span>' : '';
-    const icon = typeIcons[p.type] || '📋';
-    const priceDisplay = fmt(p.price);
-    h += `<div class="property-card" data-id="${p.id}">
-      <div class="property-card-img" style="background:${grad};">
-        <span class="emoji-icon">${icon}</span>
-        ${fe}
-        <span class="card-source">${p.source}</span>
-        <span class="card-price-tag">${priceDisplay}</span>
-        <div class="card-shine"></div>
-      </div>
-      <div class="property-card-body">
-        <span class="card-type">${p.type}</span>
-        <h3 class="card-title">${p.title}</h3>
-        <p class="card-address">📍 ${p.location}</p>
-        <div class="card-meta">
-          ${p.area ? `<span class="card-meta-item">📐 ${p.area}</span>` : ''}
-          <span class="card-meta-item" style="color:${clr};">🏷️ ${p.source}</span>
-        </div>
-        <div class="card-tags">
-          ${p.contact && p.contact.includes('@') ? `<span class="card-tag">✉️ ${p.contact}</span>` : ''}
-          ${p.phone ? `<span class="card-tag">📞 ${p.phone}</span>` : ''}
-        </div>
-        <div class="card-footer">
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openModal('${p.id}')">View Details</button>
-        </div>
-      </div>
-    </div>`;
-  });
-  g.innerHTML = h;
-  r.innerHTML = `${filtered.length} propert${filtered.length!==1?'ies':'y'} found`;
-  document.getElementById('heroCount').textContent = filtered.length;
+  try {
+    const g = document.getElementById('propertiesGrid');
+    const r = document.getElementById('resultsCount');
+    const hc = document.getElementById('heroCount');
+    if (!g || !r) return;
 
-  g.querySelectorAll('.property-card').forEach(card => {
-    card.addEventListener('click', () => { const p = properties.find(x => x.id === card.dataset.id); if (p) openModal(p.id); });
-  });
+    if (!filtered.length) {
+      g.innerHTML = '<div class="no-results"><div class="no-results-icon">\uD83D\uDD0D</div><h3>No properties found</h3><p>Try adjusting your filters or check back later for new listings.</p></div>';
+      r.innerHTML = '0 properties found';
+      if (hc) hc.textContent = '0';
+      return;
+    }
+
+    var h = '';
+    for (var i = 0; i < filtered.length; i++) {
+      var p = filtered[i];
+      var grad = gradients[i % gradients.length];
+      var clr = srcColors[p.source] || '#555';
+      var fe = p.featured ? '<span class="card-badge">\u2B50 FEATURED</span>' : '';
+      var icon = typeIcons[p.type] || '\uD83D\uDCCB';
+      var priceDisplay = fmt(p.price);
+      var areaHtml = p.area ? '<span class="card-meta-item">\uD83D\uDCD0 '+p.area+'</span>' : '';
+      var emailTag = (p.contact && p.contact.indexOf('@') >= 0) ? '<span class="card-tag">\u2709\uFE0F '+p.contact+'</span>' : '';
+      var phoneTag = p.phone ? '<span class="card-tag">\uD83D\uDCDE '+p.phone+'</span>' : '';
+
+      h += '<div class="property-card" data-id="'+p.id+'">';
+      h += '<div class="property-card-img" style="background:'+grad+';">';
+      h += '<span class="emoji-icon">'+icon+'</span>'+fe;
+      h += '<span class="card-source">'+p.source+'</span>';
+      h += '<span class="card-price-tag">'+priceDisplay+'</span>';
+      h += '<div class="card-shine"></div></div>';
+      h += '<div class="property-card-body">';
+      h += '<span class="card-type">'+p.type+'</span>';
+      h += '<h3 class="card-title">'+p.title+'</h3>';
+      h += '<p class="card-address">\uD83D\uDCCD '+p.location+'</p>';
+      h += '<div class="card-meta">'+areaHtml+'<span class="card-meta-item" style="color:'+clr+';">\uD83C\uDFF7\uFE0F '+p.source+'</span></div>';
+      h += '<div class="card-tags">'+emailTag+phoneTag+'</div>';
+      h += '<div class="card-footer"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openModal(\''+p.id+'\')">View Details</button></div>';
+      h += '</div></div>';
+    }
+    g.innerHTML = h;
+    r.innerHTML = filtered.length + ' propert' + (filtered.length !== 1 ? 'ies' : 'y') + ' found';
+    if (hc) hc.textContent = filtered.length;
+
+    // Add click listeners
+    var cards = g.querySelectorAll('.property-card');
+    for (var ci = 0; ci < cards.length; ci++) {
+      (function(card) {
+        card.addEventListener('click', function() {
+          var pid = card.getAttribute('data-id');
+          for (var pi = 0; pi < properties.length; pi++) {
+            if (properties[pi].id === pid) { openModal(pid); break; }
+          }
+        });
+      })(cards[ci]);
+    }
+  } catch(e){}
 }
 
+// ===== MODAL =====
 function openModal(id) {
-  const p = properties.find(x => x.id === id);
-  if (!p) return;
-  const clr = srcColors[p.source] || '#555';
-  const priceDisplay = fmt(p.price);
-  const icon = typeIcons[p.type] || '📋';
-  const modal = document.createElement('div');
-  modal.className = 'modal-backdrop';
-  modal.id = 'propertyModal';
-  modal.innerHTML = `<div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-img" style="background:linear-gradient(135deg,${clr}44,${clr}22);">
-      <span class="emoji-icon">${icon}</span>
-      <span class="card-source" style="z-index:3;top:1rem;right:1rem;position:absolute;">${p.source}</span>
-    </div>
-    <div class="modal-body">
-      <div class="modal-header">
-        <div>
-          <span class="card-type">${p.type}</span>
-          <h2 class="modal-title">${p.title}</h2>
-          <p class="modal-addr">📍 ${p.location}</p>
-        </div>
-        <div class="modal-price">${priceDisplay}</div>
-      </div>
-      <div class="modal-stats">
-        ${p.area ? `<div class="modal-stat"><span class="modal-stat-label">Area</span><strong>${p.area}</strong></div>` : ''}
-        <div class="modal-stat"><span class="modal-stat-label">Source</span><strong style="color:${clr}">${p.source}</strong></div>
-        <div class="modal-stat"><span class="modal-stat-label">Type</span><strong>${p.type}</strong></div>
-      </div>
-      <div class="modal-desc"><h4>Description</h4><p>${p.desc}</p></div>
-      <div class="modal-contact">
-        ${p.contactName ? `<div class="modal-contact-item">👤 ${p.contactName}</div>` : ''}
-        ${p.contact && p.contact.includes('@') ? `<div class="modal-contact-item">✉️ <a href="mailto:${p.contact}">${p.contact}</a></div>` : ''}
-        ${p.contact && !p.contact.includes('@') ? `<div class="modal-contact-item">🌐 <a href="https://${p.contact}" target="_blank">${p.contact}</a></div>` : ''}
-        ${p.phone ? `<div class="modal-contact-item">📞 ${p.phone}</div>` : ''}
-      </div>
-      <div class="modal-actions">
-        ${p.contact && p.contact.includes('@') ? `<a class="btn btn-primary" href="mailto:${p.contact}">✉️ Send Inquiry</a>` : ''}
-        <button class="btn btn-outline" onclick="closeModal()">Close</button>
-      </div>
-    </div>
-  </div>`;
-  document.body.appendChild(modal);
-  document.body.style.overflow = 'hidden';
-  setTimeout(() => modal.classList.add('open'), 10);
-  document.addEventListener('keydown', modal._key = e => { if (e.key === 'Escape') closeModal(); });
+  try {
+    var p = null;
+    for (var i = 0; i < properties.length; i++) { if (properties[i].id === id) { p = properties[i]; break; } }
+    if (!p) return;
+    var clr = srcColors[p.source] || '#555';
+    var priceDisplay = fmt(p.price);
+    var icon = typeIcons[p.type] || '\uD83D\uDCCB';
+
+    var modal = document.createElement('div');
+    modal.className = 'modal-backdrop';
+    modal.id = 'propertyModal';
+
+    var contactHtml = '';
+    if (p.contactName) contactHtml += '<div class="modal-contact-item">\uD83D\uDC64 '+p.contactName+'</div>';
+    if (p.contact && p.contact.indexOf('@') >= 0) contactHtml += '<div class="modal-contact-item">\u2709\uFE0F <a href="mailto:'+p.contact+'">'+p.contact+'</a></div>';
+    if (p.contact && p.contact.indexOf('@') < 0) contactHtml += '<div class="modal-contact-item">\uD83C\uDF10 <a href="https://'+p.contact+'" target="_blank">'+p.contact+'</a></div>';
+    if (p.phone) contactHtml += '<div class="modal-contact-item">\uD83D\uDCDE '+p.phone+'</div>';
+
+    var areaStat = p.area ? '<div class="modal-stat"><span class="modal-stat-label">Area</span><strong>'+p.area+'</strong></div>' : '';
+    var emailBtn = (p.contact && p.contact.indexOf('@') >= 0) ? '<a class="btn btn-primary" href="mailto:'+p.contact+'">\u2709\uFE0F Send Inquiry</a>' : '';
+
+    modal.innerHTML = '<div class="modal">'
+      + '<button class="modal-close" onclick="closeModal()">\u2715</button>'
+      + '<div class="modal-img" style="background:linear-gradient(135deg,'+clr+'44,'+clr+'22);">'
+      + '<span class="emoji-icon">'+icon+'</span>'
+      + '<span class="card-source" style="z-index:3;top:1rem;right:1rem;position:absolute;">'+p.source+'</span>'
+      + '</div><div class="modal-body">'
+      + '<div class="modal-header"><div>'
+      + '<span class="card-type">'+p.type+'</span>'
+      + '<h2 class="modal-title">'+p.title+'</h2>'
+      + '<p class="modal-addr">\uD83D\uDCCD '+p.location+'</p></div>'
+      + '<div class="modal-price">'+priceDisplay+'</div></div>'
+      + '<div class="modal-stats">'+areaStat
+      + '<div class="modal-stat"><span class="modal-stat-label">Source</span><strong style="color:'+clr+'">'+p.source+'</strong></div>'
+      + '<div class="modal-stat"><span class="modal-stat-label">Type</span><strong>'+p.type+'</strong></div></div>'
+      + '<div class="modal-desc"><h4>Description</h4><p>'+p.desc+'</p></div>'
+      + '<div class="modal-contact">'+contactHtml+'</div>'
+      + '<div class="modal-actions">'+emailBtn+'<button class="btn btn-outline" onclick="closeModal()">Close</button></div>'
+      + '</div></div>';
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){modal.classList.add('open');}, 10);
+    modal._key = function(e) { if (e.key === 'Escape') closeModal(); };
+    document.addEventListener('keydown', modal._key);
+  } catch(e){}
 }
 
 function closeModal() {
-  const m = document.getElementById('propertyModal');
-  if (!m) return;
-  if (m._key) document.removeEventListener('keydown', m._key);
-  m.classList.remove('open');
-  setTimeout(() => { m.remove(); document.body.style.overflow = ''; }, 300);
+  try {
+    var m = document.getElementById('propertyModal');
+    if (!m) return;
+    if (m._key) document.removeEventListener('keydown', m._key);
+    m.classList.remove('open');
+    setTimeout(function(){m.remove();document.body.style.overflow='';}, 300);
+  } catch(e){}
 }
 
 function resetFilters() {
@@ -756,131 +774,155 @@ function resetFilters() {
   apply();
 }
 
+// ===== MAP VIEW =====
 function toggleView(view) {
-  const grid = document.getElementById('propertiesGrid');
-  const mapEl = document.getElementById('propertiesMap');
-  const gb = document.getElementById('viewGrid');
-  const mb = document.getElementById('viewMap');
-  if (view === 'map') {
-    grid.style.display = 'none';
-    mapEl.style.display = 'block';
-    gb.classList.remove('active');
-    mb.classList.add('active');
-    if (!map) initMap();
-    else map.invalidateSize();
-  } else {
-    grid.style.display = '';
-    mapEl.style.display = 'none';
-    gb.classList.add('active');
-    mb.classList.remove('active');
-  }
+  try {
+    var grid = document.getElementById('propertiesGrid');
+    var mapEl = document.getElementById('propertiesMap');
+    var gb = document.getElementById('viewGrid');
+    var mb = document.getElementById('viewMap');
+    if (!grid || !mapEl || !gb || !mb) return;
+    if (view === 'map') {
+      grid.style.display = 'none';
+      mapEl.style.display = 'block';
+      gb.classList.remove('active');
+      mb.classList.add('active');
+      if (!map && typeof L !== 'undefined') initMap();
+      else if (map) map.invalidateSize();
+    } else {
+      grid.style.display = '';
+      mapEl.style.display = 'none';
+      gb.classList.add('active');
+      mb.classList.remove('active');
+    }
+  } catch(e){}
 }
 
 function initMap() {
-  map = L.map('propertiesMap', { zoomControl: true }).setView([16.402, 120.585], 13);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
-  }).addTo(map);
-  syncMap();
+  try {
+    if (typeof L === 'undefined') return;
+    map = L.map('propertiesMap', { zoomControl: true }).setView([16.402, 120.585], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>'
+    }).addTo(map);
+    syncMap();
+  } catch(e){}
 }
 
 function syncMap() {
-  if (!map) return;
-  mapMarkers.forEach(m => map.removeLayer(m));
-  mapMarkers = [];
-  const ids = new Set(filtered.map(p => p.id));
-  const shown = properties.filter(p => ids.has(p.id) && p.lat && p.lng);
-  if (!shown.length) return;
-  shown.forEach(p => {
-    const clr = srcColors[p.source] || '#555';
-    const m = L.marker([p.lat, p.lng], {
-      icon: L.divIcon({
-        html: `<div class="map-pin" style="background:${clr}">${fmt(p.price).substring(0,14)}</div>`,
-        className: '', iconSize: [0, 0], iconAnchor: [40, 14]
-      })
-    }).addTo(map);
-    m.bindPopup(`<div class="map-popup">
-      <strong class="map-popup-title">${p.title}</strong>
-      <p class="map-popup-addr">📍 ${p.location}</p>
-      <p class="map-popup-price" style="color:${clr}">${fmt(p.price)}</p>
-      <p class="map-popup-meta">${p.area ? '📐 '+p.area : ''} &nbsp; 🏷️ ${p.source}</p>
-      <button class="map-popup-btn" style="background:${clr}" onclick="document.querySelector('.modal-backdrop')?.remove();openModal('${p.id}')">View Details</button>
-    </div>`);
-    mapMarkers.push(m);
-  });
-  if (shown.length === 1) map.setView([shown[0].lat, shown[0].lng], 14);
-  else { const g = L.featureGroup(mapMarkers); map.fitBounds(g.getBounds().pad(0.15)); }
+  try {
+    if (!map || typeof L === 'undefined') return;
+    mapMarkers.forEach(function(m){map.removeLayer(m);});
+    mapMarkers = [];
+    var ids = {};
+    for (var i = 0; i < filtered.length; i++) ids[filtered[i].id] = true;
+    var shown = [];
+    for (var i = 0; i < properties.length; i++) {
+      if (ids[properties[i].id] && properties[i].lat && properties[i].lng) shown.push(properties[i]);
+    }
+    if (!shown.length) return;
+    for (var si = 0; si < shown.length; si++) {
+      var p = shown[si];
+      var clr = srcColors[p.source] || '#555';
+      var m = L.marker([p.lat, p.lng], {
+        icon: L.divIcon({
+          html: '<div class="map-pin" style="background:'+clr+'">'+fmt(p.price).substring(0,14)+'</div>',
+          className: '', iconSize: [0, 0], iconAnchor: [40, 14]
+        })
+      }).addTo(map);
+      m.bindPopup('<div class="map-popup">'
+        + '<strong class="map-popup-title">'+p.title+'</strong>'
+        + '<p class="map-popup-addr">\uD83D\uDCCD '+p.location+'</p>'
+        + '<p class="map-popup-price" style="color:'+clr+'">'+fmt(p.price)+'</p>'
+        + '<p class="map-popup-meta">'+(p.area ? '\uD83D\uDCD0 '+p.area : '')+' &nbsp; \uD83C\uDFF7\uFE0F '+p.source+'</p>'
+        + '<button class="map-popup-btn" style="background:'+clr+'" onclick="openModal(\''+p.id+'\')">View Details</button>'
+        + '</div>');
+      mapMarkers.push(m);
+    }
+    if (shown.length === 1) map.setView([shown[0].lat, shown[0].lng], 14);
+    else {
+      try {
+        var g = L.featureGroup(mapMarkers);
+        map.fitBounds(g.getBounds().pad(0.15));
+      } catch(e){}
+    }
+  } catch(e){}
 }
 
 function initFullMap() {
-  fullMap = L.map('fullMap', { zoomControl: true }).setView([16.402, 120.585], 13);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
-  }).addTo(fullMap);
-  properties.filter(p => p.lat && p.lng).forEach(p => {
-    const clr = srcColors[p.source] || '#555';
-    const m = L.marker([p.lat, p.lng], {
-      icon: L.divIcon({
-        html: `<div class="map-pin" style="background:${clr}">${p.source}</div>`,
-        className: '', iconSize: [0, 0], iconAnchor: [28, 14]
-      })
+  try {
+    if (typeof L === 'undefined') return;
+    fullMap = L.map('fullMap', { zoomControl: true }).setView([16.402, 120.585], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 18, attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>'
     }).addTo(fullMap);
-    m.bindPopup(`<div class="map-popup"><strong class="map-popup-title">${p.title}</strong><p class="map-popup-addr">📍 ${p.location}</p><p class="map-popup-price" style="color:${clr}">${fmt(p.price)}</p><button class="map-popup-btn" style="background:${clr}" onclick="openModal('${p.id}')">View Details</button></div>`);
-    fullMarkers.push(m);
-  });
+    for (var i = 0; i < properties.length; i++) {
+      var p = properties[i];
+      if (!p.lat || !p.lng) continue;
+      var clr = srcColors[p.source] || '#555';
+      var m = L.marker([p.lat, p.lng], {
+        icon: L.divIcon({
+          html: '<div class="map-pin" style="background:'+clr+'">'+p.source+'</div>',
+          className: '', iconSize: [0, 0], iconAnchor: [28, 14]
+        })
+      }).addTo(fullMap);
+      m.bindPopup('<div class="map-popup"><strong class="map-popup-title">'+p.title+'</strong><p class="map-popup-addr">\uD83D\uDCCD '+p.location+'</p><p class="map-popup-price" style="color:'+clr+'">'+fmt(p.price)+'</p><button class="map-popup-btn" style="background:'+clr+'" onclick="openModal(\''+p.id+'\')">View Details</button></div>');
+      fullMarkers.push(m);
+    }
+  } catch(e){}
 }
 
-// Nav scroll
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
-
-// Particles
-(function(){
-  const c = document.getElementById('particles');
-  for (let i = 0; i < 30; i++) {
-    const p = document.createElement('div'); p.className = 'particle';
-    p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*4+2}px;height:${Math.random()*4+2}px;animation-delay:${Math.random()*6}s;animation-duration:${Math.random()*8+6}s;opacity:${Math.random()*.3+.1};`;
-    c.appendChild(p);
-  }
-})();
-
-// Reveal observer
-const ro = new IntersectionObserver(e => { e.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); ro.unobserve(en.target); }}); }, { threshold: 0.06 });
-document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
-
-// Init
-populateFilters();
-apply();
-initFullMap();
-document.getElementById('heroSources').textContent = [...new Set(properties.map(p=>p.source))].length;
-
-
-// Contact form submit - compose email
+// ===== CONTACT FORM =====
 function submitInquiry(e) {
   e.preventDefault();
-  const name = document.getElementById('inqName').value.trim();
-  const email = document.getElementById('inqEmail').value.trim();
-  const phone = document.getElementById('inqPhone').value.trim();
-  const type = document.getElementById('inqType').value;
-  const msg = document.getElementById('inqMessage').value.trim();
-
-  const subject = encodeURIComponent('Inquiry from ' + name + ' - Palico Realty');
-  let body = 'Name: ' + name + '\n';
-  body += 'Email: ' + email + '\n';
-  if (phone) body += 'Phone: ' + phone + '\n';
-  if (type) body += 'Interest: ' + type + '\n';
-  body += '\nMessage:\n' + msg;
-  body += '\n\n---\nSent from Palico Realty - Baguio Foreclosures';
-
-  window.location.href = 'mailto:tipopalilio@gmail.com?subject=' + subject + '&body=' + encodeURIComponent(body);
-
-  // Toast feedback
-  const t = document.getElementById('formToast');
-  t.textContent = '📧 Opening your email client...';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 4000);
+  try {
+    var name = document.getElementById('inqName').value.trim();
+    var email = document.getElementById('inqEmail').value.trim();
+    var phone = document.getElementById('inqPhone').value.trim();
+    var type = document.getElementById('inqType').value;
+    var msg = document.getElementById('inqMessage').value.trim();
+    var subject = encodeURIComponent('Inquiry from ' + name + ' - Palico Realty');
+    var body = 'Name: ' + name + '\\nEmail: ' + email;
+    if (phone) body += '\\nPhone: ' + phone;
+    if (type) body += '\\nInterest: ' + type;
+    body += '\\n\\nMessage:\\n' + msg;
+    body += '\\n\\n---\\nSent from Palico Realty - Baguio Foreclosures';
+    window.location.href = 'mailto:tipopalilio@gmail.com?subject=' + subject + '&body=' + encodeURIComponent(body);
+    var t = document.getElementById('formToast');
+    if (t) { t.textContent = '\uD83D\uDCE7 Opening your email client...'; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');}, 4000); }
+  } catch(e){}
 }
 
+// ===== INIT =====
+try {
+  populateFilters();
+  apply();
+  document.getElementById('heroSources').textContent = [...new Set(properties.map(function(p){return p.source;}))].length;
+  initFullMap();
+
+  // Nav scroll
+  var nav = document.getElementById('nav');
+  if (nav) window.addEventListener('scroll', function(){nav.classList.toggle('scrolled', window.scrollY > 60);});
+
+  // Particles
+  var pc = document.getElementById('particles');
+  if (pc) {
+    for (var i = 0; i < 30; i++) {
+      var pt = document.createElement('div'); pt.className = 'particle';
+      pt.style.cssText = 'left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;width:'+(Math.random()*4+2)+'px;height:'+(Math.random()*4+2)+'px;animation-delay:'+(Math.random()*6)+'s;animation-duration:'+(Math.random()*8+6)+'s;opacity:'+(Math.random()*.3+.1)+';';
+      pc.appendChild(pt);
+    }
+  }
+
+  // Reveal observer
+  var ro = new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting){en.target.classList.add('visible');ro.unobserve(en.target);}});}, {threshold:0.06});
+  document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
+
+} catch(e) {
+  // Fallback: show message if JS fails
+  var rc = document.getElementById('resultsCount');
+  if (rc) rc.innerHTML = 'Unable to load properties. Please refresh the page.';
+}
 </script>
 </body>
 </html>
