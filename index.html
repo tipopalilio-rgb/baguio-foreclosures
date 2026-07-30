@@ -256,7 +256,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+<text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%8F%A0</text></svg>"></head>
 <body>
 
@@ -563,7 +563,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
 
 // ===== DATA =====
 var properties = [
@@ -919,7 +919,7 @@ function submitInquiry(e) {
   document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
 })();
 
-});
+
 </script>
 <noscript><div style="position:fixed;bottom:0;left:0;right:0;background:#dc2626;color:#fff;text-align:center;padding:.75rem;z-index:9999;font-size:.9rem;">⚠️ Please enable JavaScript to view property listings.</div></noscript></body>
 </html>
