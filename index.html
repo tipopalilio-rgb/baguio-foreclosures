@@ -254,10 +254,12 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 .grid-loading { grid-column: 1 / -1; text-align: center; padding: 4rem 0; }
 .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
-</style>
 
-<text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%8F%A0</text></svg>"></head>
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+.input-wrap { display: contents; }</style>
+
+<text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>"><text y=%22.9em%22 font-size=%2290%22>%F0%9F%8F%A0</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%8C%82</text></svg>"></head>
 <body>
 
 <nav class="nav" id="nav">
@@ -308,19 +310,19 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
     <div class="filters-section" style="padding:0;border:none;margin-bottom:1.5rem;">
       <div class="filters-bar">
         <div class="filter-group">
-          <label>Source</label>
+          <label for="filterSource">Source</label>
           <select id="filterSource" onchange="apply()">
             <option value="all">All Sources</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>Type</label>
+          <label for="filterType">Type</label>
           <select id="filterType" onchange="apply()">
             <option value="all">All Types</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>Min Price</label>
+          <label for="filterMin">Min Price</label>
           <select id="filterMin" onchange="apply()">
             <option value="0">Any</option>
             <option value="500000">₱500K</option>
@@ -331,7 +333,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
           </select>
         </div>
         <div class="filter-group">
-          <label>Max Price</label>
+          <label for="filterMax">Max Price</label>
           <select id="filterMax" onchange="apply()">
             <option value="99999999">Any</option>
             <option value="1000000">₱1M</option>
@@ -342,7 +344,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
           </select>
         </div>
         <div class="filter-group">
-          <label>Sort</label>
+          <label for="sortBy">Sort</label>
           <select id="sortBy" onchange="apply()">
             <option value="default">Default</option>
             <option value="price-asc">Price ↑</option>
@@ -521,12 +523,12 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
       </div>
       <form class="contact-form" onsubmit="submitInquiry(event)">
         <div class="form-row">
-          <input type="text" id="inqName" placeholder="Your Name *" required>
-          <input type="email" id="inqEmail" placeholder="Your Email *" required>
+          <div class="input-wrap"><label for="inqName" class="sr-only">Your Name</label><input type="text" id="inqName" placeholder="Your Name *" required></div>
+          <div class="input-wrap"><label for="inqEmail" class="sr-only">Your Email</label><input type="email" id="inqEmail" placeholder="Your Email *" required></div>
         </div>
         <div class="form-row">
-          <input type="tel" id="inqPhone" placeholder="Phone Number (optional)">
-          <select id="inqType">
+          <div class="input-wrap"><label for="inqPhone" class="sr-only">Phone Number</label><input type="tel" id="inqPhone" placeholder="Phone Number (optional)"></div>
+          <div class="input-wrap"><label for="inqType" class="sr-only">Interest</label><select id="inqType">
             <option value="">I'm interested in...</option>
             <option value="buying">Buying a Property</option>
             <option value="referral">Becoming a Referral Partner</option>
@@ -534,7 +536,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
             <option value="info">General Inquiry</option>
           </select>
         </div>
-        <textarea id="inqMessage" placeholder="Tell us what you're looking for — specific property, price range, location, or any questions... *" required></textarea>
+        <div class="input-wrap" style="grid-column:1/-1"><label for="inqMessage" class="sr-only">Message</label><textarea id="inqMessage" placeholder="Tell us what you're looking for — specific property, price range, location, or any questions... *" required></textarea></div>
         <p class="form-note">This form opens your email client. Hit send to submit your inquiry.</p>
         <button type="submit" class="btn btn-primary">✉️ Send Inquiry</button>
       </form>
@@ -563,7 +565,6 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); lin
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-console.log("PalicoJS: v2 running, DOMContentLoaded="+document.readyState);
 // ===== DATA =====
 var properties = [
   {id:'bsp-cliff',title:'Cliff Drive Residential Lot',location:'Purok Ongasan, Brgy. Loakan',price:4095000,type:'Lot',source:'BSP',area:'',desc:'BSP-acquired property available for negotiated sale. Buyer must tender at least 20% deposit of the offer price.',contact:'CoronadoVM@bsp.gov.ph',contactName:'Manolito V. Coronado Jr.',phone:'(02) 5306-3422',featured:true,lat:16.411,lng:120.622},
@@ -635,7 +636,6 @@ function populateFilters() {
 }
 
 function apply() {
-  console.log("PalicoJS: apply() called");
   var q = document.getElementById('heroSearch').value.toLowerCase().trim();
   var src = document.getElementById('filterSource').value;
   var typ = document.getElementById('filterType').value;
@@ -661,7 +661,6 @@ function apply() {
 
 // ===== RENDER =====
 function render() {
-  console.log("PalicoJS: render() called, filtered="+filtered.length);
   var g = document.getElementById('propertiesGrid');
   var r = document.getElementById('resultsCount');
   var hc = document.getElementById('heroCount');
@@ -888,7 +887,6 @@ function submitInquiry(e) {
 
 // ===== INIT =====
 (function init() {
-  console.log("PalicoJS: init() started");
   // Hide loading spinner
   var gl = document.getElementById('gridLoading');
   if (gl) gl.style.display = 'none';
