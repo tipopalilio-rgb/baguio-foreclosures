@@ -17,19 +17,19 @@
   },
   {
     "id": "bpi-sunnyside",
-    "title": "Sunnyside Residential Lots (L3-L10 B8)",
-    "location": "Fairview / Sunnyside Subdivision",
+    "title": "Sunnyside Residential Lots (L3 & L10 B8) - Fairview",
+    "location": "Fairview / Sunnyside Subdivision, Baguio City",
     "price": 416000,
     "type": "Lot",
     "source": "BPI",
     "area": "~800 sqm each",
-    "desc": "Multiple residential lots available through the Buena Mano program. Sold as-is, where-is.",
-    "contact": "buenamano@bpi.com.ph",
-    "contactName": "BPI Buena Mano",
+    "desc": "Two residential lots via BPI Buena Mano: 00287-DAG-018 (L3 B8) and 00294-DAG-018 (L10 B8), each at PHP 416,000. Sold as-is, where-is. Known impediments: not in bank possession (occupied by informal settlers), landlocked (no road access per tax mapping; existing access is via a stairwell on a private lot), unidentified boundaries. Buyer assumes eviction of informal settlers and relocation survey.",
+    "contact": "ebsabutan1@bpi.com.ph",
+    "contactName": "BPI SAMS - Elderly Sabutan",
     "phone": "",
     "featured": false,
-    "lat": 16.395,
-    "lng": 120.575
+    "lat": 16.418957,
+    "lng": 120.579083
   },
   {
     "id": "bpi-bermuda",
@@ -65,7 +65,7 @@
   },
   {
     "id": "security-bank",
-    "title": "Bakakeng Central Lot \u2014 Crystal Cave",
+    "title": "Bakakeng Central Lot — Crystal Cave",
     "location": "Crystal Cave, Bakakeng Central",
     "price": 28171000,
     "type": "Lot",
@@ -97,7 +97,7 @@
   },
   {
     "id": "msg",
-    "title": "San Luis Village Lot \u2014 Asin Road",
+    "title": "San Luis Village Lot — Asin Road",
     "location": "Asin Road",
     "price": 10125000,
     "type": "Lot",
@@ -145,7 +145,7 @@
   },
   {
     "id": "pagibig-st",
-    "title": "Santo Tomas Lot \u2014 C.C.O.D.A.",
+    "title": "Santo Tomas Lot — C.C.O.D.A.",
     "location": "C.C.O.D.A. Subdivision",
     "price": 1215000,
     "type": "Lot",
@@ -177,7 +177,7 @@
   },
   {
     "id": "pagibig-c",
-    "title": "3rd The Court Condominium \u2014 Ambiong",
+    "title": "3rd The Court Condominium — Ambiong",
     "location": "CY-M2-B3-3BF-002, Ambiong",
     "price": 5250000,
     "type": "Condo",
@@ -305,8 +305,8 @@
   },
   {
     "id": "cari2",
-    "title": "Dominican Hill\u2013Mirador House",
-    "location": "Dominican Hill\u2013Mirador",
+    "title": "Dominican Hill–Mirador House",
+    "location": "Dominican Hill–Mirador",
     "price": 7170000,
     "type": "House",
     "source": "Cari / Dotproperty",
@@ -369,7 +369,7 @@
   },
   {
     "id": "cari6",
-    "title": "Lexberville House \u2014 Sto. Tomas",
+    "title": "Lexberville House — Sto. Tomas",
     "location": "Lexberville, Sto. Tomas",
     "price": 8800000,
     "type": "House",
@@ -417,7 +417,7 @@
   },
   {
     "id": "bsp-pinget",
-    "title": "CTricom Village House & Lot \u2014 Pinget",
+    "title": "CTricom Village House & Lot — Pinget",
     "location": "Lot 1, CTricom Village, Pinget",
     "price": 0,
     "type": "House",
@@ -433,7 +433,7 @@
   },
   {
     "id": "pagibig-irisant1",
-    "title": "Mary Land Homes Townhouse \u2014 Irisan",
+    "title": "Mary Land Homes Townhouse — Irisan",
     "location": "Lot 09 Blk. 10, Mary Land Homes, Irisan",
     "price": 1650600,
     "type": "Townhouse",
@@ -465,7 +465,7 @@
   },
   {
     "id": "eagle-crest",
-    "title": "Eagle Crest Villas Townhouse \u2014 Sto. Tomas",
+    "title": "Eagle Crest Villas Townhouse — Sto. Tomas",
     "location": "Lot 2-B, Eagle Crest Villas Phase 2, Sto. Tomas Proper",
     "price": 0,
     "type": "Townhouse",
